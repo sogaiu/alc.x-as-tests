@@ -1,17 +1,44 @@
 ;; TODO
 ;;
-;; XXX: possibly better to detect and abort for following:
+;; XXX: some large values are more readable formatted.  unfortunately,
+;;      this can be manual work.  it would be nice to have a more
+;;      automated way to achieve formatting.  try to think of some
+;;      ways to achieve this.
 ;;
-;;      1) more than one ns form
-;;      2) more than one in-ns form
+;; XXX: there may be other issues noted as comments in the source.  look for
+;;      "XXX"
+
+;; QUESTIONS:
+;;
+;; XXX: support reading source via a file path?
+;;
+;; XXX: support exceptions as expected values?  come up with notation
+;;      to express this.
+;;
+;; XXX: when an expected value is a long string, it is cumbersome to
+;;      see and thus manually verify, edit, etc.  is there anything
+;;      that can be done about this?
+;;
+;; XXX: arranging for approriate whitespace for output seems to make
+;;      things kind of complex.  try to postpone addressing them to
+;;      the end or ignore them when testing (via some kind of
+;;      normalization?)?  since there are depdencies anyway, would
+;;      including zprint, cljfmt, cljstyle, or similar and using that
+;;      sort of thing to format the results be worth it?  zprint in
+;;      default mode didn't seem to help.  cljstyle seems promising.
+;;
+;; XXX: should there be an initial "analysis" that leads to early
+;;      termination?  such an analysis might check if there any of
+;;      the following conditions are true:
+;;
+;;      1) there is more than one ns form
+;;      2) there is more than one in-ns form
 ;;      3) both ns and in-ns forms exist
+;;      4) deftest or other test-like forms exist (tricky?)
 ;;
 ;;      this motivates the idea of "directives" to instruct
 ;;      specifically where to place the clojure.test require and old
 ;;      test erasing forms.
-;;
-;; XXX: another thing to be wary of is a file that already has deftest
-;;      or other testing constructs in it
 ;;
 ;; XXX: consider supporting "directives" -- e.g. comment blocks that
 ;;      contain particular sequences that affect the "transformation".
@@ -27,25 +54,7 @@
 ;;      require and run-tests), but existence of a particular one
 ;;      might turn off the default behavior).
 ;;
-;; XXX: whitespace issues seem to make things kind of complex.  is
-;;      there some way to postpone them to the end or ignore them when
-;;      testing?  since there are depdencies anyway, would including
-;;      zprint, cljfmt, cljstyle, or similar and using that sort of thing to
-;;      format the results be worth it?  zprint in default mode didn't
-;;      seem to help.  cljstyle seems promising.
-;;
-;; XXX: some large values are more readable formatted.  unfortunately,
-;;      this can be manual work.  it would be nice to have a more
-;;      automated way to achieve formatting.
-;;
-;; XXX: when an expected value is a long string, it is cumbersome to
-;;      see and thus manually verify, edit, etc.  is there anything
-;;      that can be done about this?
-;;
-;; XXX: there may be other issues noted as comments in the source.  look for
-;;      "XXX"
-
-;; QUESTIONS:
+;; XXX: support doctests?
 ;;
 ;; XXX: printing results out seems to be helpful when manually
 ;;      verifying some kinds of results.  for automation, printed
