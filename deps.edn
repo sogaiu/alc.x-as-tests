@@ -1,0 +1,10 @@
+{:paths [
+         "src"
+        ]
+
+ :deps {
+        org.clojure/clojure {:mvn/version "1.10.2-alpha1"}
+        carocad/parcera {:mvn/version "0.11.1"}
+        org.antlr/antlr4-runtime {:mvn/version "4.7.1"}
+       }
+}

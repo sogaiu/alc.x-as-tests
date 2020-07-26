@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+if [ -z "$GRAALVM_HOME" ]; then
+    echo "Please set GRAALVM_HOME"
+    exit 1
+fi
+
+"$GRAALVM_HOME/bin/gu" install native-image || true
+
+lein do clean, uberjar
+
+$GRAALVM_HOME/bin/native-image \
+  -jar target/alc.x-as-tests-0.0.1-SNAPSHOT-standalone.jar \
+  -H:Name=alc.xat \
+  -H:+ReportExceptionStackTraces \
+  -J-Dclojure.spec.skip-macros=true \
+  -J-Dclojure.compiler.direct-linking=true \
+  --initialize-at-build-time \
+  -H:Log=registerResource: \
+  --verbose \
+  --no-fallback \
+  --no-server \
+  "-J-Xmx5g"
+
+lein clean
