@@ -1,0 +1,141 @@
+# alc.x-as-tests
+
+## Purpose
+
+Use a variety of things as tests.
+
+Currently, one idea is to use [certain
+constructs](doc/comment-block-tests.md) within Clojure's `comment`
+blocks as tests, e.g.:
+
+```
+(comment
+
+  (- 1 1)
+  ;; => 0
+
+)
+```
+
+## Status
+
+Early stage.
+
+## Prerequisites
+
+* clj / tools.deps(.alpha), or
+* Leiningen + Graalvm + native-image
+
+## Use Cases and Limitations
+
+[When](doc/use-cases.md) this might be useful, and the [fine
+print](doc/limitations.md).
+
+## Quick Trial
+
+Suppose there is a Clojure project directory:
+
+`~/a-clj-proj-dir`
+
+and a source file with appropriate comment blocks at:
+
+`~/a-clj-proj-dir/src/fun.clj`
+
+Generate a file with tests for `fun.clj` and execute them by:
+
+```
+$ cd ~/a-clj-proj-dir
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | clj -
+```
+
+## General Setup and Use
+
+alc.x-as-tests can be used via `clj` via appropriate configuration of
+`deps.edn`.  It can also be used via a native-image binary `alc.xat`
+(see below for building instructions).
+
+To use via `clj`, first edit `~/.clojure/deps.edn` to have an alias
+like:
+
+```
+...
+:aliases
+{
+ :x-as-tests ; or :alc.x-as-tests
+ {
+  :extra-deps {sogaiu/alc.x-as-tests
+                {:git/url "https://github.com/sogaiu/alc.x-as-tests"
+                 :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}
+  :main-opts ["-m" "alc.x-as-tests.main"]
+ }
+```
+
+To generate a file with tests from a file (e.g. `src/fun.clj`) and
+save it (e.g. as `fun-with-tests.clj`):
+
+```
+$ cat src/fun.clj | clj -A:x-as-tests > fun-with-tests.clj
+```
+
+or with the native-image binary:
+
+```
+$ cat src/fun.clj | alc.xat > fun-with-tests.clj
+```
+
+Note: `fun-with-tests.clj` is an ordinary Clojure file.
+
+To run the tests (in e.g. `fun-with-tests.clj`) with `clj`:
+
+```
+$ clj -i fun-with-tests.clj
+{:test 55, :pass 55, :fail 0, :error 0}
+```
+
+To generate and run in one invocation with `clj`:
+
+```
+$ cat src/fun.clj | clj -A:x-as-tests | clj -
+```
+
+or with the native-image binary:
+
+```
+$ cat src/fun.clj | alc.xat | clj -
+```
+
+## Building
+
+Building the native-image binary requires Leiningen and Graalvm.  (At
+the moment, only Linux and macos have been tested.)
+
+With Leiningen installed and Graalvm 20.1.0 for Java 11 uncompressed
+at `$HOME/src/graalvm-ce-java11-20.1.0`:
+
+```
+git clone https://github.com/sogaiu/alc.x-as-tests
+cd alc.x-as-tests
+export GRAALVM_HOME=$HOME/src/graalvm-ce-java11-20.1.0
+export PATH=$GRAALVM_HOME/bin:$PATH
+bash script/compile
+```
+
+This should produce a binary named `alc.xat`.  Putting this or a
+symlink to it on `PATH` might make things more convenient.
+
+## Technical Details
+
+Curious about some [technical details](doc/technical-details.md)?  No?
+That's why they are not on this page :)
+
+## Related
+
+* [judge-gen](https://github.com/sogaiu/judge-gen)
+
+## Acknowledgments
+
+* borkdude - babashka, graalvm native-image work, pod-babashka-parcera, etc.
+* carocad - parcera
+* lread - clj-graal-docs and rewrite-cljc
+* pyrmont - discussion
+* Saikyun - discussion and testing
