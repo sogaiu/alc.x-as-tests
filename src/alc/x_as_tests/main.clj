@@ -27,18 +27,23 @@
 ;;      require and run-tests), but existence of a particular one
 ;;      might turn off the default behavior).
 ;;
-;; XXX: compile and test for macos and windows (create compile.bat)
-;;
 ;; XXX: whitespace issues seem to make things kind of complex.  is
 ;;      there some way to postpone them to the end or ignore them when
 ;;      testing?  since there are depdencies anyway, would including
 ;;      zprint, cljfmt, cljstyle, or similar and using that sort of thing to
 ;;      format the results be worth it?  zprint in default mode didn't
-;;      seem to help.
+;;      seem to help.  cljstyle seems promising.
 ;;
 ;; XXX: some large values are more readable formatted.  unfortunately,
 ;;      this can be manual work.  it would be nice to have a more
 ;;      automated way to achieve formatting.
+;;
+;; XXX: when an expected value is a long string, it is cumbersome to
+;;      see and thus manually verify, edit, etc.  is there anything
+;;      that can be done about this?
+;;
+;; XXX: there may be other issues noted as comments in the source.  look for
+;;      "XXX"
 
 ;; QUESTIONS:
 ;;
@@ -78,17 +83,13 @@
 ;;
 ;; * the keywords in nodes seem verbose -- :whitespace vs :ws
 ;;
-;; * when an expected value is a long string, it is cumbersome to see
-;;   and thus manually verify, edit, etc.  is there anything that can
-;;   be done about this?
-;;
 ;; * values like: (:list (:symbol "def") ...) might be inconvenient to
 ;;   express as "expected" values (eval-ing them leads to errors)
 ;;   converting them to use vector notation is a work-around, but for
 ;;   nested things seems rather more work than one might like.  using
 ;;   a single quote at the beginning seems to work ok.
 ;;
-;; * comment blocks within comment blocks remain comment block after
+;; * comment blocks within comment blocks remain comment blocks after
 ;;   transformation.  this can be seen as a feature to have things
 ;;   that one only evaluates via the repl.
 
