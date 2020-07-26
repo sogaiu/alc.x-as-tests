@@ -106,8 +106,9 @@ $ cat src/fun.clj | alc.xat | clj -
 
 ## Building
 
-Building the native-image binary requires Leiningen and Graalvm.  (At
-the moment, only Linux and macos have been tested.)
+Building the native-image binary requires Leiningen and Graalvm.
+
+### Linux and macos
 
 With Leiningen installed and Graalvm 20.1.0 for Java 11 uncompressed
 at `$HOME/src/graalvm-ce-java11-20.1.0`:
@@ -122,6 +123,28 @@ bash script/compile
 
 This should produce a binary named `alc.xat`.  Putting this or a
 symlink to it on `PATH` might make things more convenient.
+
+### Windows 10
+
+With Leiningen installed and Graalvm 20.1.0 for Java 11 uncompressed
+at `C:\Users\user\Desktop\graalvm-ce-java11-20.1.0`, in a x64 Native
+Tools Command Prompt:
+
+```
+git clone https://github.com/sogaiu/alc.x-as-tests
+cd alc.x-as-tests
+set GRAALVM_HOME=C:\Users\user\Desktop\graalvm-ce-java11-20.1.0
+.\script\compile.bat
+```
+
+This should produce a binary named `alc.xat.exe`.  Putting this on
+`PATH` might make things more convenient.
+
+Note that on Windows, one of the usage invocations might be like:
+
+```
+C:\Users\user\Desktop\alc.x-as-tests> type src\alc\x_as_tests\impl|ast.clj | .\alc.xat.exe > ast-with-test.clj
+```
 
 ## Technical Details
 
