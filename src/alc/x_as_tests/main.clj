@@ -10,22 +10,12 @@
 
 ;; QUESTIONS:
 ;;
-;; XXX: arranging for approriate whitespace for output seems to make
-;;      things kind of complex.  try to postpone addressing them to
-;;      the end or ignore them when testing (via some kind of
-;;      normalization?)?  since there are depdencies anyway, would
-;;      including zprint, cljfmt, cljstyle, or similar and using that
-;;      sort of thing to format the results be worth it?  zprint in
-;;      default mode didn't seem to help.  cljstyle seems promising.
-;;
-;; XXX: support reading source via a file path?
+;; XXX: support command line options?  can experiment via a single
+;;      "map".  possible options include: input file path, output file
+;;      path.
 ;;
 ;; XXX: support exceptions as expected values?  come up with notation
 ;;      to express this.
-;;
-;; XXX: when an expected value is a long string, it is cumbersome to
-;;      see and thus manually verify, edit, etc.  is there anything
-;;      that can be done about this?
 ;;
 ;; XXX: should there be an initial "analysis" that leads to early
 ;;      termination?  such an analysis might check if there any of
@@ -56,11 +46,6 @@
 ;;
 ;; XXX: support doctests?
 ;;
-;; XXX: printing results out seems to be helpful when manually
-;;      verifying some kinds of results.  for automation, printed
-;;      results aren't obviously available?  isn't there something
-;;      like "print" that returns the value that it prints?
-;;
 ;; XXX: rename some things in ast to end in "-node"?
 ;;      e.g. whitespace-node?
 ;;
@@ -70,8 +55,31 @@
 ;;      results of calling pc/ast (e.g. (pc/ast " ")) in implementations
 ;;      (not necessarily tests in comment blocks) as this will shield
 ;;      the code from parcera changes.  is this a relevant concern?
-;;      if so, should the comment block tests also not refer to
-;;      parcera nodes (e.g. [:whitespace " "])?
+;;      this has been addressed, but not within comment block tests.
+;;      not clear whether they should also not refer to parcera
+;;      nodes (e.g. [:whitespace " "]).
+;;
+;; XXX: arranging for approriate whitespace for output seems to make
+;;      things kind of complex.  try to postpone addressing them to
+;;      the end or ignore them when testing (via some kind of
+;;      normalization?)?  since there are depdencies anyway, would
+;;      including zprint, cljfmt, cljstyle, or similar and using that
+;;      sort of thing to format the results be worth it?  zprint in
+;;      default mode didn't seem to help.  cljstyle seems promising.
+;;      have slightly improved whitespace situation, so waiting to
+;;      see if anything more needs to be done.
+;;
+;; XXX: when an expected value is a long string, it is cumbersome to
+;;      see and thus manually verify, edit, etc.  using multi-line
+;;      strings for the moment -- quoting is necessary in some places,
+;;      but it's an improvement over the previous situation.  a
+;;      downside is they need to be printed first, so there is a bit
+;;      of tedium, but waiting to see if it is tolerable.
+;;
+;; XXX: printing results out seems to be helpful when manually
+;;      verifying some kinds of results.  for automation, printed
+;;      results aren't obviously available?  isn't there something
+;;      like "print" that returns the value that it prints?
 
 ;; OBSERVATIONS
 ;;
