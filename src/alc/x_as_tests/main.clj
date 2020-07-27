@@ -10,6 +10,14 @@
 
 ;; QUESTIONS:
 ;;
+;; XXX: arranging for approriate whitespace for output seems to make
+;;      things kind of complex.  try to postpone addressing them to
+;;      the end or ignore them when testing (via some kind of
+;;      normalization?)?  since there are depdencies anyway, would
+;;      including zprint, cljfmt, cljstyle, or similar and using that
+;;      sort of thing to format the results be worth it?  zprint in
+;;      default mode didn't seem to help.  cljstyle seems promising.
+;;
 ;; XXX: support reading source via a file path?
 ;;
 ;; XXX: support exceptions as expected values?  come up with notation
@@ -18,14 +26,6 @@
 ;; XXX: when an expected value is a long string, it is cumbersome to
 ;;      see and thus manually verify, edit, etc.  is there anything
 ;;      that can be done about this?
-;;
-;; XXX: arranging for approriate whitespace for output seems to make
-;;      things kind of complex.  try to postpone addressing them to
-;;      the end or ignore them when testing (via some kind of
-;;      normalization?)?  since there are depdencies anyway, would
-;;      including zprint, cljfmt, cljstyle, or similar and using that
-;;      sort of thing to format the results be worth it?  zprint in
-;;      default mode didn't seem to help.  cljstyle seems promising.
 ;;
 ;; XXX: should there be an initial "analysis" that leads to early
 ;;      termination?  such an analysis might check if there any of
