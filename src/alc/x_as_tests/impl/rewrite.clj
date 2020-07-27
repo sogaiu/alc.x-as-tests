@@ -373,8 +373,8 @@
         (:comment ";; => 2")
         (:whitespace "\n")))
 
-  (ast/update-forms src-with-one-comment-block-with-one-test
-                    rewrite-comment-blocks-with-tests)
+  (ast/update-forms-and-format src-with-one-comment-block-with-one-test
+                               rewrite-comment-blocks-with-tests)
   #_ "
 
 (clojure.test/deftest test-at-line-2 
@@ -400,11 +400,9 @@
               ""
               ":y"]))
 
-  (ast/update-forms src-with-one-comment-block-with-two-tests
-                    rewrite-comment-blocks-with-tests)
+  (ast/update-forms-and-format src-with-one-comment-block-with-two-tests
+                               rewrite-comment-blocks-with-tests)
   #_ ":x
-
-
 
 (clojure.test/deftest test-at-line-7 
 
@@ -438,11 +436,9 @@
               "  ;; => 20"
               ")"]))
 
-  (ast/update-forms src-with-two-comment-blocks
-                    rewrite-comment-blocks-with-tests)
+  (ast/update-forms-and-format src-with-two-comment-blocks
+                               rewrite-comment-blocks-with-tests)
   #_ ":a
-
-
 
 (clojure.test/deftest test-at-line-5 
 
@@ -450,13 +446,11 @@
 
 :c
 
-
-
 (clojure.test/deftest test-at-line-13 
 
   (clojure.test/is (= 20 (- 21 1))))"
 
-  (def comment-block-with-line-comment-and-discard-tests
+  (def line-comment-and-discard-tests
     (cs/join "\n"
              ["(comment"
               ""
@@ -473,8 +467,8 @@
               ""
               ")"]))
 
-  (ast/update-forms comment-block-with-line-comment-and-discard-tests
-                    rewrite-comment-blocks-with-tests)
+  (ast/update-forms-and-format line-comment-and-discard-tests
+                               rewrite-comment-blocks-with-tests)
   #_ "
 
 (clojure.test/deftest test-at-line-5 
@@ -738,7 +732,7 @@
         test-summary-forms [nls
                             (run-tests-with-summary-form)
                             nls]]
-    (ast/update-forms
+    (ast/update-forms-and-format
      src
      (fn [nodes]
        (let [without-prep-forms
@@ -766,8 +760,39 @@
              "      :b]"
              ""
              ")"]))
-  ;; => "(ns my.ns)\n\n(->> (keys (ns-interns *ns*))\n     (filter (fn [test-name]\n       (re-matches #\"^test-at-line-.*\"\n         (name test-name))))\n     (run! (fn [test-name]\n             (ns-unmap *ns* test-name))))\n\n(require 'clojure.test)\n\n\n(clojure.test/deftest test-at-line-4 \n\n  (clojure.test/is (= 8 (+ 1 7))))\n\n(clojure.test/deftest test-at-line-7 \n\n  (clojure.test/is (= [:a\n      :b] (conj [:a] :b))))\n\n(clojure.test/do-report\n  (binding [clojure.test/*report-counters*\n            (ref clojure.test/*initial-report-counters*)]\n    (clojure.test/test-vars\n      (keep\n        (fn [test-name]\n          (when (re-matches #\"^test-at-line-.*\"\n                  (name test-name))\n            (intern *ns* (symbol test-name))))\n        (sort (keys (ns-interns *ns*)))))\n    @clojure.test/*report-counters*))\n\n"
+  #_ "(ns my.ns)
 
+(->> (keys (ns-interns *ns*))
+     (filter (fn [test-name]
+       (re-matches #\"^test-at-line-.*\"
+         (name test-name))))
+     (run! (fn [test-name]
+             (ns-unmap *ns* test-name))))
+
+(require 'clojure.test)
+
+(clojure.test/deftest test-at-line-4 
+
+  (clojure.test/is (= 8 (+ 1 7))))
+
+(clojure.test/deftest test-at-line-7 
+
+  (clojure.test/is (= [:a
+      :b] (conj [:a] :b))))
+
+(clojure.test/do-report
+  (binding [clojure.test/*report-counters*
+            (ref clojure.test/*initial-report-counters*)]
+    (clojure.test/test-vars
+      (keep
+        (fn [test-name]
+          (when (re-matches #\"^test-at-line-.*\"
+                  (name test-name))
+            (intern *ns* (symbol test-name))))
+        (sort (keys (ns-interns *ns*)))))
+    @clojure.test/*report-counters*))
+
+"
   (rewrite-with-tests
    (cs/join "\n"
             ["(in-ns 'my.ns)"
@@ -783,8 +808,39 @@
              "      :b]"
              ""
              ")"]))
-  ;; "(in-ns 'my.ns)\n\n(->> (keys (ns-interns *ns*))\n     (filter (fn [test-name]\n       (re-matches #\"^test-at-line-.*\"\n         (name test-name))))\n     (run! (fn [test-name]\n             (ns-unmap *ns* test-name))))\n\n(require 'clojure.test)\n\n\n\n(clojure.test/deftest test-at-line-5 \n\n  (clojure.test/is (= 8 (+ 1 7))))\n\n(clojure.test/deftest test-at-line-8 \n\n  (clojure.test/is (= [:a\n      :b] (conj [:a] :b))))\n\n(clojure.test/do-report\n  (binding [clojure.test/*report-counters*\n            (ref clojure.test/*initial-report-counters*)]\n    (clojure.test/test-vars\n      (keep\n        (fn [test-name]\n          (when (re-matches #\"^test-at-line-.*\"\n                  (name test-name))\n            (intern *ns* (symbol test-name))))\n        (sort (keys (ns-interns *ns*)))))\n    @clojure.test/*report-counters*))\n\n"
+  #_ "(in-ns 'my.ns)
 
+(->> (keys (ns-interns *ns*))
+     (filter (fn [test-name]
+       (re-matches #\"^test-at-line-.*\"
+         (name test-name))))
+     (run! (fn [test-name]
+             (ns-unmap *ns* test-name))))
+
+(require 'clojure.test)
+
+(clojure.test/deftest test-at-line-5 
+
+  (clojure.test/is (= 8 (+ 1 7))))
+
+(clojure.test/deftest test-at-line-8 
+
+  (clojure.test/is (= [:a
+      :b] (conj [:a] :b))))
+
+(clojure.test/do-report
+  (binding [clojure.test/*report-counters*
+            (ref clojure.test/*initial-report-counters*)]
+    (clojure.test/test-vars
+      (keep
+        (fn [test-name]
+          (when (re-matches #\"^test-at-line-.*\"
+                  (name test-name))
+            (intern *ns* (symbol test-name))))
+        (sort (keys (ns-interns *ns*)))))
+    @clojure.test/*report-counters*))
+
+"
   (rewrite-with-tests
    (cs/join "\n"
             ["(comment"
@@ -797,7 +853,39 @@
              "      :b]"
              ""
              ")"]))
-  ;; => "\n\n(->> (keys (ns-interns *ns*))\n     (filter (fn [test-name]\n       (re-matches #\"^test-at-line-.*\"\n         (name test-name))))\n     (run! (fn [test-name]\n             (ns-unmap *ns* test-name))))\n\n(require 'clojure.test)\n\n(clojure.test/deftest test-at-line-3 \n\n  (clojure.test/is (= 8 (+ 1 7))))\n\n(clojure.test/deftest test-at-line-6 \n\n  (clojure.test/is (= [:a\n      :b] (conj [:a] :b))))\n\n(clojure.test/do-report\n  (binding [clojure.test/*report-counters*\n            (ref clojure.test/*initial-report-counters*)]\n    (clojure.test/test-vars\n      (keep\n        (fn [test-name]\n          (when (re-matches #\"^test-at-line-.*\"\n                  (name test-name))\n            (intern *ns* (symbol test-name))))\n        (sort (keys (ns-interns *ns*)))))\n    @clojure.test/*report-counters*))\n\n"
+  #_ "
+
+(->> (keys (ns-interns *ns*))
+     (filter (fn [test-name]
+       (re-matches #\"^test-at-line-.*\"
+         (name test-name))))
+     (run! (fn [test-name]
+             (ns-unmap *ns* test-name))))
+
+(require 'clojure.test)
+
+(clojure.test/deftest test-at-line-3 
+
+  (clojure.test/is (= 8 (+ 1 7))))
+
+(clojure.test/deftest test-at-line-6 
+
+  (clojure.test/is (= [:a
+      :b] (conj [:a] :b))))
+
+(clojure.test/do-report
+  (binding [clojure.test/*report-counters*
+            (ref clojure.test/*initial-report-counters*)]
+    (clojure.test/test-vars
+      (keep
+        (fn [test-name]
+          (when (re-matches #\"^test-at-line-.*\"
+                  (name test-name))
+            (intern *ns* (symbol test-name))))
+        (sort (keys (ns-interns *ns*)))))
+    @clojure.test/*report-counters*))
+
+"
 
   )
 
