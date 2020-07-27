@@ -117,18 +117,11 @@
 
 ;; XXX: deftest style for the moment
 (defn rewrite-as-test
-  [actual-node expected-node stack & test-name]
-  (let [test-name (cond
-                    (seq test-name) ; non-empty
-                    (first test-name)
-                    ;;
-                    (ast/has-start-meta? actual-node)
-                    (str "test-at-line-"
-                         ;; XXX: factor out as function?
-                         (ast/start-row actual-node))
-                    ;;
-                    :else
-                    (throw (Exception. "Failed to assign name to test")))]
+  [actual-node expected-node stack]
+  (assert (ast/has-start-meta? actual-node)
+          "actual node missing location info")
+  (let [test-name (str "test-at-line-"
+                       (ast/start-row actual-node))]
     ;; splicing seems cumbersome
     (into (create-deftest-opening test-name)
           (conj (vec stack)
@@ -178,16 +171,17 @@
           (:number "1") (:whitespace " ")
           (:number "1"))]]]
 
-  (rewrite-as-test '(:list
+  (rewrite-as-test '^{:parcera.core/start {:row 1, :column 0},
+                      :parcera.core/end {:row 1, :column 12}}
+                   (:list
                       (:symbol "+") (:whitespace " ")
                       (:number "1") (:whitespace " ")
                       (:number "1"))
                     '(:comment ";; => 2")
-                    []
-                    "foo")
+                    [])
   #_ '[:list
        [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "foo"] [:whitespace " "]
+       [:symbol "test-at-line-1"] [:whitespace " "]
        [:list
         [:symbol "clojure.test/is"] [:whitespace " "]
         [:list
@@ -198,7 +192,9 @@
           (:number "1") (:whitespace " ")
           (:number "1"))]]]
 
-  (rewrite-as-test '(:list
+  (rewrite-as-test '^{:parcera.core/start {:row 1, :column 0},
+                      :parcera.core/end {:row 1, :column 12}}
+                     (:list
                       (:symbol "+") (:whitespace " ")
                       (:number "1") (:whitespace " ")
                       (:number "1"))
@@ -207,11 +203,10 @@
                        (:symbol "def") (:whitespace " ")
                        (:symbol "b") (:whitespace " ")
                        (:number "1"))
-                     '(:whitespace "\n\n  ")]
-                    "foo")
+                     '(:whitespace "\n\n  ")])
   #_ '[:list
        [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "foo"] [:whitespace " "]
+       [:symbol "test-at-line-1"] [:whitespace " "]
        (:list
         (:symbol "def") (:whitespace " ")
         (:symbol "b") (:whitespace " ")
