@@ -401,6 +401,18 @@
 
 )
 
+(defn whitespace-str
+  [node]
+  (when (whitespace? node)
+    (second node)))
+
+(comment
+
+  (whitespace-str '(:whitespace " \n "))
+  ;; => " \n "
+
+  )
+
 (defn discard-with-form?
   [ast]
   (some-> (first ast)
@@ -670,5 +682,139 @@
 
   (has-ns-ish-form? (forms src-without-ns-form-again))
   ;; => true
+
+  )
+
+(defn collapse-whitespace
+  [ws-str]
+  (cond
+    (cs/includes? ws-str "\n\n")
+    "\n\n"
+    ;;
+    (cs/includes? ws-str "\n")
+    "\n"
+    ;;
+    :else
+    " "))
+
+(comment
+
+  (collapse-whitespace "  ")
+  ;; => " "
+
+  (collapse-whitespace "\n\n")
+  ;; => "\n\n"
+
+  (collapse-whitespace "\n ")
+  ;; => "\n"
+
+  (collapse-whitespace " \n")
+  ;; => "\n"
+
+  )
+
+(defn merge-whitespace
+  [nodes]
+  (let [[merged ws-node]
+        (reduce (fn [[merged ws-node] node]
+                  ;; immediately previous node was whitespace node
+                  (if ws-node
+                    (let [prev-ws (whitespace-str ws-node)]
+                      (if (whitespace? node)
+                        (let [ws (whitespace-str node)]
+                          [merged [:whitespace
+                                   (collapse-whitespace (str prev-ws ws))]])
+                        [(conj merged ws-node node) nil]))
+                    ;; immediately previous node wasn't whitespace node
+                    (if (whitespace? node)
+                      (let [ws (whitespace-str node)]
+                        [merged [:whitespace (collapse-whitespace ws)]])
+                      [(conj merged node) nil])))
+                [[] nil]
+                nodes)]
+    ;; handles possibility of non-nil ws-node
+    (if ws-node
+      (conj merged ws-node)
+      merged)))
+
+(comment
+
+  (merge-whitespace '((:whitespace " ")
+                      (:whitespace " ")))
+  #_ '((:whitespace " "))
+
+  (merge-whitespace '((:whitespace "\n")
+                      (:whitespace "\n")))
+  #_ '((:whitespace "\n\n"))
+
+  (merge-whitespace '((:whitespace "\n")
+                      (:whitespace " ")))
+  #_ '((:whitespace "\n"))
+
+  (merge-whitespace '((:whitespace " ")
+                      (:whitespace "\n")))
+  #_ '((:whitespace "\n"))
+
+  (merge-whitespace '((:keyword ":a")
+                      (:whitespace " ")
+                      (:whitespace "\n")))
+  #_ '[(:keyword ":a")
+       [:whitespace "\n"]]
+
+  (merge-whitespace '((:keyword ":a")
+                      (:whitespace "\n")
+                      (:whitespace " ")
+                      (:whitespace "\n")
+                      (:keyword ":b")))
+  #_ '[(:keyword ":a")
+       [:whitespace "\n\n"]
+       (:keyword ":b")]
+
+  )
+
+(defn update-forms-and-format
+  [src a-fn]
+  (->> (forms src)
+       ;; operate on the interior nodes
+       a-fn
+       ;; for debugging
+       ;;((fn [x] (print "after a-fn: " x) x))
+       merge-whitespace
+       ;; wrap up and convert to string
+       to-str))
+
+(comment
+
+  (update-forms-and-format
+   (str (cs/join "\n"
+                 ["(comment"
+                  ""
+                  "  (def a 1)"
+                  ""
+                  "  (+ a 1)"
+                  "  ;; => 2"
+                  ""
+                  "  (def b 1)"
+                  ""
+                  "  (conj {:a a} [:b b])"
+                  "  #_ {:a a"
+                  "      :b b}"
+                  ""
+                  ")"]))
+   unwrap-comment-blocks)
+  #_ "
+
+(def a 1)
+
+(+ a 1)
+;; => 2
+
+(def b 1)
+
+(conj {:a a} [:b b])
+#_ {:a a
+      :b b}
+
+"
 
   )
