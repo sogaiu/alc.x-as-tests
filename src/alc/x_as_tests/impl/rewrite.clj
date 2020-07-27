@@ -793,6 +793,7 @@
     @clojure.test/*report-counters*))
 
 "
+
   (rewrite-with-tests
    (cs/join "\n"
             ["(in-ns 'my.ns)"
@@ -841,6 +842,7 @@
     @clojure.test/*report-counters*))
 
 "
+
   (rewrite-with-tests
    (cs/join "\n"
             ["(comment"
