@@ -50,37 +50,10 @@
 
   )
 
-(defn wrap-forms
-  [nodes]
-  (into [:code] nodes))
-
-(comment
-
-  (def some-forms
-    '((:list
-       (:symbol "+") (:whitespace " ")
-       (:number "1") (:whitespace " ")
-       (:number "1"))
-      (:whitespace "\n")))
-
-  (wrap-forms some-forms)
-  #_ '[:code
-       (:list
-        (:symbol "+")
-        (:whitespace " ")
-        (:number "1")
-        (:whitespace " ")
-        (:number "1"))
-       (:whitespace "\n")]
-
-  (pc/code (wrap-forms some-forms))
-  ;; => "(+ 1 1)\n"
-
-  )
-
 (defn to-str
   [nodes]
-  (pc/code (wrap-forms nodes)))
+  (->> (into [:code] nodes)
+       pc/code))
 
 (comment
 
@@ -268,8 +241,7 @@
        ;; for debugging
        ;;((fn [x] (print "after a-fn: " x) x))
        ;; wrap result back up
-       (wrap-forms)
-       (pc/code)))
+       to-str))
 
 (comment
 
