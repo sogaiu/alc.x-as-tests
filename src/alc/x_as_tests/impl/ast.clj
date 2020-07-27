@@ -432,17 +432,16 @@
 
   )
 
-;; XXX: iiuc, discard forms in parcera can have up to 2
-;;      elements in them.  if there are two elements,
-;;      the first is whitespace.
+;; from Clojure.g4 in parcera:
 ;;
-;;      if the understanding above is false, the following
-;;      code should be modified.
+;; discard: '#_' (whitespace? discard)? whitespace? form;
 (defn undiscard
   [ast]
   (when (discard-with-form? ast)
     (->> (rest ast)
-         (drop-while whitespace?)
+         (remove whitespace?)
+         ;; discard can "stack"
+         (remove discard-with-form?)
          first)))
 
 (comment
@@ -463,6 +462,19 @@
   #_ '(:map
        (:keyword ":a") (:whitespace " ")
        (:number "1"))
+
+  ;; stacked discard forms parse like this:
+  (first-form "#_ #_ :a :b")
+  #_ '(:discard
+       (:whitespace " ")
+       (:discard
+        (:whitespace " ")
+        (:keyword ":a"))
+       (:whitespace " ")
+       (:keyword ":b"))
+
+  (undiscard (first-form "#_ #_ :a :b"))
+  ;; => '(:keyword ":b")
 
   )
 
