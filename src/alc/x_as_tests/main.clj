@@ -64,14 +64,7 @@
 ;; XXX: rename some things in ast to end in "-node"?
 ;;      e.g. whitespace-node?
 ;;
-;; XXX: should wrap-forms call parcera.core/code?  if so, rename?
-;;      there is now a separate function that does this.  try to remove
-;;      wrap-forms?
-;;
 ;; XXX: test if metadata is handled in actual / expected expressions?
-;;
-;; XXX: clojure.string is used within comment blocks but not outside,
-;;      is it worth being concerned about this?
 ;;
 ;; XXX: replace use of parcera nodes (e.g. [:whitespace " "]) with
 ;;      results of calling pc/ast (e.g. (pc/ast " ")) in implementations
@@ -79,10 +72,6 @@
 ;;      the code from parcera changes.  is this a relevant concern?
 ;;      if so, should the comment block tests also not refer to
 ;;      parcera nodes (e.g. [:whitespace " "])?
-;;
-;; XXX: if no metadata, how to choose test name?  it shouldn't stay
-;;      static upon repeated invocations?  should this even be
-;;      supported?
 
 ;; OBSERVATIONS
 ;;
