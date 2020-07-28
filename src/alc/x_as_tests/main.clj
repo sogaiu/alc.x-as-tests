@@ -89,6 +89,9 @@
 ;;
 ;; * the keywords in nodes seem verbose -- :whitespace vs :ws
 ;;
+;; * with-out-str is handy for validating values sent to standard
+;;   output via the use of functions like print
+;;
 ;; * values like: (:list (:symbol "def") ...) might be inconvenient to
 ;;   express as "expected" values (eval-ing them leads to errors)
 ;;   converting them to use vector notation is a work-around, but for
