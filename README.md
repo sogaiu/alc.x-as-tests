@@ -107,6 +107,9 @@ or with the native-image binary:
 $ cat src/fun.clj | alc.xat | clj -
 ```
 
+See [here](doc/lein-and-boot.md) for hints on adopting these
+invocations for use with Leiningen and/or Boot.
+
 ## Building
 
 Building the native-image binary requires Leiningen and Graalvm.
