@@ -104,7 +104,8 @@
 
 (ns alc.x-as-tests.main
   (:require
-   [alc.x-as-tests.impl.rewrite :as rewrite])
+   [alc.x-as-tests.impl.rewrite :as rewrite]
+   [alc.x-as-tests.impl.validate :as validate])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -112,6 +113,10 @@
 (defn -main
   [& _]
   (let [slurped (slurp *in*)]
-    (print (rewrite/rewrite-with-tests slurped)))
-  (flush)
-  (System/exit 0))
+    (when-not (validate/check-source slurped)
+      (binding [*out* *err*]
+        (println "Errors detected in source"))
+      (System/exit 1))
+    (print (rewrite/rewrite-with-tests slurped))
+    (flush)
+    (System/exit 0)))

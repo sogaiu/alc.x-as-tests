@@ -9,7 +9,7 @@ fi
 
 "$GRAALVM_HOME/bin/gu" install native-image || true
 
-lein do clean, uberjar
+lein with-profiles +native-image "do" clean, uberjar
 
 $GRAALVM_HOME/bin/native-image \
   -jar target/alc.x-as-tests-0.0.1-SNAPSHOT-standalone.jar \

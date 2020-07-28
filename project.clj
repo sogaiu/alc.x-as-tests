@@ -2,13 +2,16 @@
   :description "x as tests"
   :url "https://github.com/sogaiu/alc.x-as-tests"
   :source-paths ["src"]
-  :dependencies [[org.clojure/clojure "1.10.2-alpha1"]
-                 [carocad/parcera "0.11.1"]
-                 [org.antlr/antlr4-runtime "4.7.1"]]
+  :dependencies [[carocad/parcera "0.11.1"]
+                 [clj-kondo "2020.07.26"]
+                 [org.antlr/antlr4-runtime "4.7.1"]
+                 [org.clojure/clojure "1.10.2-alpha1"]]
   :profiles {:socket-repl
              {:jvm-opts
               ["-Dclojure.server.repl={:port 8235
                                        :accept clojure.core.server/repl}"]}
+             :native-image {:dependencies [[borkdude/clj-reflector-graal-java11-fix "0.0.1-graalvm-20.1.0"]
+                                           [borkdude/sci.impl.reflector "0.0.1-java11"]]}
              :uberjar {:global-vars {*assert* false}
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"
                                   "-Dclojure.spec.skip-macros=true"]
