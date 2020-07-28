@@ -23,8 +23,8 @@ Early stage.
 
 ## Prerequisites
 
-* clj / tools.deps(.alpha), or
-* Leiningen + Graalvm + native-image
+* Running: clj / tools.deps(.alpha)
+* Building executable (optional): Leiningen + Graalvm + native-image
 
 ## Use Cases and Limitations
 
