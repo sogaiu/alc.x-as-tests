@@ -259,8 +259,8 @@
                         ;; XXX: tweaking this leads to test tweaking...
                         (ast/first-form "\n\n")
                         (rewrite-as-test last-non-ws-form
-                                          elt
-                                          (prune-stack stack)))
+                                         elt
+                                         (prune-stack stack)))
                   []])))
            ;; rewritten and stack
            [[] []])
