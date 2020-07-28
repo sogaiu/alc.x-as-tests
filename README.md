@@ -33,7 +33,7 @@ print](doc/limitations.md).
 
 ## Quick Trial
 
-Suppose there is a Clojure project directory:
+Suppose there is a Clojure project directory using `deps.edn`:
 
 `~/a-clj-proj-dir`
 
@@ -46,6 +46,13 @@ Generate a file with tests for `fun.clj` and execute them by:
 ```
 $ cd ~/a-clj-proj-dir
 $ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | clj -
+```
+
+If the Clojure project uses Leiningen, the following may work instead:
+
+```
+$ cd ~/a-clj-proj-dir
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | lein repl
 ```
 
 ## General Setup and Use
