@@ -48,20 +48,8 @@ $ cd ~/a-clj-proj-dir
 $ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | clj -
 ```
 
-If the Clojure project uses Leiningen, the following may work instead:
-
-```
-$ cd ~/a-clj-proj-dir
-$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | lein repl
-```
-
-It may also be possible via [lein
-exec](https://github.com/kumarshantanu/lein-exec), but this has not
-been tested.
-
-Note that in general, the last piece of the pipe needs to start up in
-a way such that the Clojure process has an appropriate classpath and
-it reads the tests file from standard input.
+See [here](doc/lein-and-boot.md) for some more details including use
+with Leiningen and/or Boot.
 
 ## General Setup and Use
 
