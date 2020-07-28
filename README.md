@@ -163,7 +163,7 @@ That's why they are not on this page :)
 
 ## Acknowledgments
 
-* borkdude - babashka, graalvm native-image work, pod-babashka-parcera, etc.
+* borkdude - babashka, clj-kondo, graalvm native-image work, pod-babashka-parcera, discussion, etc.
 * carocad - parcera
 * lread - clj-graal-docs and rewrite-cljc
 * pyrmont - discussion
