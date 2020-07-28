@@ -32,7 +32,7 @@ Then:
 boot -f fun-with-tests.clj
 ```
 
-Incidentally, that can sort of thing can be done with `clj` too:
+Incidentally, that sort of thing can be done with `clj` too:
 
 ```
 clj -i fun-with-tests.clj
