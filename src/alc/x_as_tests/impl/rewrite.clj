@@ -28,14 +28,14 @@
 (defn create-deftest-opening
   [test-name]
   (ast/first-form-vec
-   (str "(clojure.test/deftest " test-name " )")))
+   (str "(clojure.test/deftest " test-name ")")))
 
 (comment
 
   (create-deftest-opening "test-at-line-7650")
   #_ '[:list
        (:symbol "clojure.test/deftest") (:whitespace " ")
-       (:symbol "test-at-line-7650") (:whitespace " ")]
+       (:symbol "test-at-line-7650")]
 
   )
 
@@ -160,7 +160,7 @@
     (rewrite-as-test actual expected []))
   #_ '[:list
        [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-2"] [:whitespace " "]
+       [:symbol "test-at-line-2"]
        [:list
         [:symbol "clojure.test/is"] [:whitespace " "]
         [:list
@@ -181,7 +181,7 @@
                     [])
   #_ '[:list
        [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-1"] [:whitespace " "]
+       [:symbol "test-at-line-1"]
        [:list
         [:symbol "clojure.test/is"] [:whitespace " "]
         [:list
@@ -206,7 +206,7 @@
                      '(:whitespace "\n\n  ")])
   #_ '[:list
        [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-1"] [:whitespace " "]
+       [:symbol "test-at-line-1"]
        (:list
         (:symbol "def") (:whitespace " ")
         (:symbol "b") (:whitespace " ")
@@ -276,7 +276,7 @@
   #_ '[[:whitespace "\n\n"]
        [:list
         [:symbol "clojure.test/deftest"] [:whitespace " "]
-        [:symbol "test-at-line-2"] [:whitespace " "]
+        [:symbol "test-at-line-2"]
         (:whitespace "\n  ")
         [:list
          [:symbol "clojure.test/is"] [:whitespace " "]
@@ -305,7 +305,7 @@
   #_ '[(:whitespace "\n\n")
        [:list
         (:symbol "clojure.test/deftest") (:whitespace " ")
-        (:symbol "test-at-line-4") (:whitespace " ")
+        (:symbol "test-at-line-4")
         (:whitespace "\n  ")
         (:list
          (:symbol "def") (:whitespace " ")
@@ -324,7 +324,7 @@
        (:whitespace "\n\n")
        [:list
         (:symbol "clojure.test/deftest") (:whitespace " ")
-        (:symbol "test-at-line-9") (:whitespace " ")
+        (:symbol "test-at-line-9")
         (:whitespace "\n\n  ")
         (:list
          (:symbol "def") (:whitespace " ")
@@ -377,7 +377,7 @@
                                rewrite-comment-blocks-with-tests)
   #_ "
 
-(clojure.test/deftest test-at-line-2 
+(clojure.test/deftest test-at-line-2
   (clojure.test/is (= 2 (+ 1 1))))"
 
   (def src-with-one-comment-block-with-two-tests
@@ -404,13 +404,13 @@
                                rewrite-comment-blocks-with-tests)
   #_ ":x
 
-(clojure.test/deftest test-at-line-7 
+(clojure.test/deftest test-at-line-7
 
   (def a 1)
 
   (clojure.test/is (= 2 (+ a 1))))
 
-(clojure.test/deftest test-at-line-12 
+(clojure.test/deftest test-at-line-12
 
   (def b 1)
 
@@ -440,13 +440,13 @@
                                rewrite-comment-blocks-with-tests)
   #_ ":a
 
-(clojure.test/deftest test-at-line-5 
+(clojure.test/deftest test-at-line-5
 
   (clojure.test/is (= 2 (+ 1 1))))
 
 :c
 
-(clojure.test/deftest test-at-line-13 
+(clojure.test/deftest test-at-line-13
 
   (clojure.test/is (= 20 (- 21 1))))"
 
@@ -471,13 +471,13 @@
                                rewrite-comment-blocks-with-tests)
   #_ "
 
-(clojure.test/deftest test-at-line-5 
+(clojure.test/deftest test-at-line-5
 
   (def a 1)
 
   (clojure.test/is (= 2 (+ a 1))))
 
-(clojure.test/deftest test-at-line-10 
+(clojure.test/deftest test-at-line-10
 
   (def b 1)
 
@@ -771,11 +771,11 @@
 
 (require 'clojure.test)
 
-(clojure.test/deftest test-at-line-4 
+(clojure.test/deftest test-at-line-4
 
   (clojure.test/is (= 8 (+ 1 7))))
 
-(clojure.test/deftest test-at-line-7 
+(clojure.test/deftest test-at-line-7
 
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
@@ -797,7 +797,6 @@
   (rewrite-with-tests
    (cs/join "\n"
             ["(in-ns 'my.ns)"
-
              ""
              "(comment"
              ""
@@ -820,11 +819,11 @@
 
 (require 'clojure.test)
 
-(clojure.test/deftest test-at-line-5 
+(clojure.test/deftest test-at-line-5
 
   (clojure.test/is (= 8 (+ 1 7))))
 
-(clojure.test/deftest test-at-line-8 
+(clojure.test/deftest test-at-line-8
 
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
@@ -866,11 +865,11 @@
 
 (require 'clojure.test)
 
-(clojure.test/deftest test-at-line-3 
+(clojure.test/deftest test-at-line-3
 
   (clojure.test/is (= 8 (+ 1 7))))
 
-(clojure.test/deftest test-at-line-6 
+(clojure.test/deftest test-at-line-6
 
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
