@@ -113,9 +113,11 @@
 (defn -main
   [& _]
   (let [slurped (slurp *in*)]
-    (when-not (validate/check-source slurped)
+    (when-let [findings (validate/check-source slurped)]
       (binding [*out* *err*]
-        (println "Errors detected in source"))
+        (println "Errors detected in source")
+        (doseq [{:keys [message row]} findings]
+          (println "row:" row " - " message)))
       (System/exit 1))
     (print (rewrite/rewrite-with-tests slurped))
     (flush)
