@@ -19,6 +19,7 @@ call %GRAALVM_HOME%\bin\native-image.cmd ^
   "-H:+ReportExceptionStackTraces" ^
   "-J-Dclojure.spec.skip-macros=true" ^
   "-J-Dclojure.compiler.direct-linking=true" ^
+  "-H:ReflectionConfigurationFiles=reflection.json" ^
   "--initialize-at-build-time"  ^
   "-H:Log=registerResource:" ^
   "--no-fallback" ^

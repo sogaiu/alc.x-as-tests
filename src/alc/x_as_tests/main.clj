@@ -1,13 +1,5 @@
 ;; TODO
 ;;
-;; XXX: support for just getting transformed comment block content --
-;;      i.e.  don't output the originally uncommented portions.  this
-;;      might be useful for use at the repl being used via "load-file"
-;;      or just sent as a string.
-;;
-;; XXX: try to spell out some ideas about how to generate and trigger
-;;      tests for all .clj files in a project.
-;;
 ;; XXX: whether and how to support cljs.  there are multiple cljs
 ;;      runtimes, so the idea of "supporting cljs" is not specific
 ;;      enough.  try to spell out some more specifics.
@@ -27,6 +19,8 @@
 ;;
 ;; XXX: consider something like deep diff 2 for improving scannability
 ;;      of test output?
+;;
+;; XXX: clean up test directory option?
 ;;
 ;; XXX: some things appear not so straight-forward as expected values,
 ;;      e.g. anonymous functions, objects, etc.  some things don't matter
@@ -137,6 +131,12 @@
 
 ;; OBSERVATIONS
 ;;
+;; * recurring issue of trying to arrange for concise illustrative
+;;   values for inputs and outputs in tests / examples
+;;
+;; * writing platform-independent tests tends to increases complexity,
+;;   often takes longer, and may make code harder to read.
+;;
 ;; * parcera returns things that look almost like hiccup
 ;;
 ;; * parcera/code can be fed hiccup
@@ -159,20 +159,25 @@
 (ns alc.x-as-tests.main
   (:require
    [alc.x-as-tests.impl.rewrite :as rewrite]
+   [alc.x-as-tests.impl.runner :as runner]
    [alc.x-as-tests.impl.validate :as validate])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
 
 (defn -main
-  [& _]
-  (let [slurped (slurp *in*)]
-    (when-let [findings (validate/check-source slurped)]
-      (binding [*out* *err*]
-        (println "Errors detected in source")
-        (doseq [{:keys [message row]} findings]
-          (println "row:" row " - " message)))
-      (System/exit 1))
-    (print (rewrite/rewrite-with-tests slurped))
-    (flush)
-    (System/exit 0)))
+  [& args]
+  (if (= (first args) "test")
+    ;; XXX: draft -- allow specification of things from command line?
+    (runner/do-tests! {})
+    ;; generate test
+    (let [slurped (slurp *in*)]
+      (when-let [findings (validate/check-source slurped)]
+        (binding [*out* *err*]
+          (println "Errors detected in source")
+          (doseq [{:keys [message row]} findings]
+            (println "row:" row " - " message)))
+        (System/exit 1))
+      (print (rewrite/rewrite-with-tests slurped))))
+  (flush)
+  (System/exit 0))

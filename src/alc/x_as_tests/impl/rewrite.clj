@@ -534,40 +534,40 @@
 (defn run-tests-with-summary-form
   []
   (ast/first-form
-   (cs/join "\n" ["(clojure.test/do-report"
-                  "  (binding [clojure.test/*report-counters*"
-                  "            (ref clojure.test/*initial-report-counters*)]"
+   (cs/join "\n" ["(binding [clojure.test/*report-counters*"
+                  "          (ref clojure.test/*initial-report-counters*)]"
+                  "  (clojure.test/do-report"
                   "    (clojure.test/test-vars"
                   "      (keep"
                   "        (fn [test-name]"
                   "          (when (re-matches #\"^test-at-line-.*\""
                   "                  (name test-name))"
                   "            (intern *ns* (symbol test-name))))"
-                  "        (sort (keys (ns-interns *ns*)))))"
-                  "    @clojure.test/*report-counters*))"])))
+                  "        (sort (keys (ns-interns *ns*))))))"
+                  "  @clojure.test/*report-counters*)"])))
 
 (comment
 
   (run-tests-with-summary-form)
   #_ '(:list
-       (:symbol "clojure.test/do-report") (:whitespace "\n  ")
+       (:symbol "binding") (:whitespace " ")
+       (:vector
+        (:symbol "clojure.test/*report-counters*")
+        (:whitespace "\n          ")
+        (:list
+         (:symbol "ref") (:whitespace " ")
+         (:symbol "clojure.test/*initial-report-counters*")))
+       (:whitespace "\n  ")
        (:list
-        (:symbol "binding") (:whitespace " ")
-        (:vector
-         (:symbol "clojure.test/*report-counters*")
-         (:whitespace "\n            ")
-         (:list
-          (:symbol "ref") (:whitespace " ")
-          (:symbol "clojure.test/*initial-report-counters*")))
-        (:whitespace "\n    ")
+        (:symbol "clojure.test/do-report") (:whitespace "\n    ")
         (:list
          (:symbol "clojure.test/test-vars") (:whitespace "\n      ")
          (:list
           (:symbol "keep") (:whitespace "\n        ")
           (:list
            (:symbol "fn") (:whitespace " ")
-           (:vector (:symbol "test-name"))
-           (:whitespace "\n          ")
+           (:vector
+            (:symbol "test-name")) (:whitespace "\n          ")
            (:list
             (:symbol "when") (:whitespace " ")
             (:list
@@ -591,10 +591,10 @@
             (:symbol "keys") (:whitespace " ")
             (:list
              (:symbol "ns-interns") (:whitespace " ")
-             (:symbol "*ns*"))))))
-        (:whitespace "\n    ")
-        (:deref
-         (:symbol "clojure.test/*report-counters*"))))
+             (:symbol "*ns*")))))))
+       (:whitespace "\n  ")
+       (:deref
+        (:symbol "clojure.test/*report-counters*")))
 
   )
 
@@ -780,17 +780,17 @@
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
 
-(clojure.test/do-report
-  (binding [clojure.test/*report-counters*
-            (ref clojure.test/*initial-report-counters*)]
+(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
     (clojure.test/test-vars
       (keep
         (fn [test-name]
           (when (re-matches #\"^test-at-line-.*\"
                   (name test-name))
             (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*)))))
-    @clojure.test/*report-counters*))
+        (sort (keys (ns-interns *ns*))))))
+  @clojure.test/*report-counters*)
 
 "
 
@@ -828,17 +828,17 @@
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
 
-(clojure.test/do-report
-  (binding [clojure.test/*report-counters*
-            (ref clojure.test/*initial-report-counters*)]
+(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
     (clojure.test/test-vars
       (keep
         (fn [test-name]
           (when (re-matches #\"^test-at-line-.*\"
                   (name test-name))
             (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*)))))
-    @clojure.test/*report-counters*))
+        (sort (keys (ns-interns *ns*))))))
+  @clojure.test/*report-counters*)
 
 "
 
@@ -874,22 +874,140 @@
   (clojure.test/is (= [:a
       :b] (conj [:a] :b))))
 
-(clojure.test/do-report
-  (binding [clojure.test/*report-counters*
-            (ref clojure.test/*initial-report-counters*)]
+(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
     (clojure.test/test-vars
       (keep
         (fn [test-name]
           (when (re-matches #\"^test-at-line-.*\"
                   (name test-name))
             (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*)))))
-    @clojure.test/*report-counters*))
+        (sort (keys (ns-interns *ns*))))))
+  @clojure.test/*report-counters*)
 
 "
 
   )
 
+(defn rewrite-without-non-comment-blocks
+  [src]
+  (let [nls (ast/first-form "\n\n")
+        test-prep-forms [nls
+                         (remove-existing-tests-form)
+                         nls
+                         (require-form)]
+        test-summary-forms [nls
+                            (run-tests-with-summary-form)
+                            nls]]
+    (ast/update-forms-and-format
+     src
+     (fn [nodes]
+       (into test-prep-forms
+             (into (rewrite-comment-blocks-with-tests
+                    (filter ast/comment-block? nodes))
+                   test-summary-forms))))))
+
+(comment
+
+  (rewrite-without-non-comment-blocks
+   (cs/join "\n"
+            ["(comment"
+             ""
+             "  (+ 1 7)"
+             "  ;; => 8"
+             ""
+             "  (conj [:a] :b)"
+             "  #_ [:a"
+             "      :b]"
+             ""
+             ")"]))
+  #_ "
+
+(->> (keys (ns-interns *ns*))
+     (filter (fn [test-name]
+       (re-matches #\"^test-at-line-.*\"
+         (name test-name))))
+     (run! (fn [test-name]
+             (ns-unmap *ns* test-name))))
+
+(require 'clojure.test)
+
+(clojure.test/deftest test-at-line-3
+
+  (clojure.test/is (= 8 (+ 1 7))))
+
+(clojure.test/deftest test-at-line-6
+
+  (clojure.test/is (= [:a
+      :b] (conj [:a] :b))))
+
+(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
+    (clojure.test/test-vars
+      (keep
+        (fn [test-name]
+          (when (re-matches #\"^test-at-line-.*\"
+                  (name test-name))
+            (intern *ns* (symbol test-name))))
+        (sort (keys (ns-interns *ns*))))))
+  @clojure.test/*report-counters*)
+
+"
+
+  (rewrite-without-non-comment-blocks
+   (cs/join "\n"
+            ["(ns my.ns)"
+             ""
+             "(comment"
+             ""
+             "  (+ 1 7)"
+             "  ;; => 8"
+             ""
+             "  (conj [:a] :b)"
+             "  #_ [:a"
+             "      :b]"
+             ""
+             "(def fun :a)"
+             ")"]))
+  #_ "
+
+(->> (keys (ns-interns *ns*))
+     (filter (fn [test-name]
+       (re-matches #\"^test-at-line-.*\"
+         (name test-name))))
+     (run! (fn [test-name]
+             (ns-unmap *ns* test-name))))
+
+(require 'clojure.test)
+
+(clojure.test/deftest test-at-line-5
+
+  (clojure.test/is (= 8 (+ 1 7))))
+
+(clojure.test/deftest test-at-line-8
+
+  (clojure.test/is (= [:a
+      :b] (conj [:a] :b))))
+
+(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
+    (clojure.test/test-vars
+      (keep
+        (fn [test-name]
+          (when (re-matches #\"^test-at-line-.*\"
+                  (name test-name))
+            (intern *ns* (symbol test-name))))
+        (sort (keys (ns-interns *ns*))))))
+  @clojure.test/*report-counters*)
+
+"
+
+  )
+
+;; XXX: this is experimental
 (defn run-test-via-path
   [path]
   (eval (read-string (str "(do"
@@ -901,9 +1019,12 @@
   ;; don't want this running automatically
   (comment
 
+    (require '[alc.x-as-tests.impl.paths :as paths])
+
     (def a-path
-      (str (System/getenv "HOME")
-           "/src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"))
+      (paths/as-abspath (System/getProperty "user.dir")
+                        "src" "alc" "x_as_tests" "impl"
+                        "ast.clj"))
 
     (require 'clojure.test)
 
