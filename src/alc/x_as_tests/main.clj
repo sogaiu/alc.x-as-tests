@@ -1,5 +1,20 @@
 ;; TODO
 ;;
+;; XXX: support for just getting transformed comment block content --
+;;      i.e.  don't output the originally uncommented portions.  this
+;;      might be useful for use at the repl being used via "load-file"
+;;      or just sent as a string.
+;;
+;; XXX: try to spell out some ideas about how to generate and trigger
+;;      tests for all .clj files in a project.
+;;
+;; XXX: whether and how to support cljs.  there are multiple cljs
+;;      runtimes, so the idea of "supporting cljs" is not specific
+;;      enough.  try to spell out some more specifics.
+;;
+;; XXX: consider starting a list of things that need a bit of work
+;;      to express in actual values (e.g. macro names, lists, etc.)
+;;
 ;; XXX: some large values are more readable formatted.  unfortunately,
 ;;      this can be manual work.  it would be nice to have a more
 ;;      automated way to achieve formatting.  try to think of some
@@ -10,21 +25,58 @@
 
 ;; QUESTIONS:
 ;;
-;; XXX: support command line options?  can experiment via a single
-;;      "map".  possible options include: input file path, output file
-;;      path.
+;; XXX: consider something like deep diff 2 for improving scannability
+;;      of test output?
+;;
+;; XXX: some things appear not so straight-forward as expected values,
+;;      e.g. anonymous functions, objects, etc.  some things don't matter
+;;      may be (e.g. function values), but use predicates for others?
+;;
+;; XXX: should there be a way to extend the recognized syntax?  beware
+;;      this idea as it may lead to complexity.  if considering, try to
+;;      choose something that has a nice compositional structure?  (cf.
+;;      regular expression mathematical structure)
+;;
+;; XXX: predicate support?
+;;
+;;        (create-text "hi" {:size 5})
+;;        #_ #(str/includes? % "5")
+;;
+;;      * change number of semicolons?
+;;      * change => to something else?
+;;
+;;      are multiline predicates really necessary?  wouldn't defining
+;;      a function beforehand and using that be sufficient?
 ;;
 ;; XXX: support exceptions as expected values?  come up with notation
-;;      to express this.
+;;      to express this.  can map to clojure.test's thrown? and/or
+;;      thrown-with-msg? perhaps.
+;;
+;; XXX: support command line options?  can experiment via a single
+;;      "map".  possible options include:
+;;
+;;      * input file path (good for programmatic use)
+;;      * output file path (good for programmatic use)
+;;      * turn off validation (possibly to increase speed of
+;;        processing at the cost of errors -- good for cljs at repl?)
+;;      * expose rewrite-without-non-comment-blocks
+;;      * debug / verbose mode
+;;      * dump parcera nodes to stderr
 ;;
 ;; XXX: should there be an initial "analysis" that leads to early
-;;      termination?  such an analysis might check if there any of
-;;      the following conditions are true:
+;;      termination (cf. validation)?  such an analysis might check if
+;;      there any of the following conditions are true:
 ;;
 ;;      1) there is more than one ns form
 ;;      2) there is more than one in-ns form
 ;;      3) both ns and in-ns forms exist
 ;;      4) deftest or other test-like forms exist (tricky?)
+;;
+;;      analysis tasks might include:
+;;
+;;      * verification that syntactically correct
+;;      * meets preconditions regarding ns-related forms
+;;      * verify that there is at least one test
 ;;
 ;;      this motivates the idea of "directives" to instruct
 ;;      specifically where to place the clojure.test require and old
@@ -45,6 +97,8 @@
 ;;      might turn off the default behavior).
 ;;
 ;; XXX: support doctests?
+;;
+;; XXX: look into continuous integration options?
 ;;
 ;; XXX: rename some things in ast to end in "-node"?
 ;;      e.g. whitespace-node?
