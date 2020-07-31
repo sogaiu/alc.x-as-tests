@@ -159,20 +159,29 @@
 (ns alc.x-as-tests.main
   (:require
    [alc.x-as-tests.impl.rewrite :as rewrite]
-   [alc.x-as-tests.impl.validate :as validate])
+   [alc.x-as-tests.impl.runner :as runner]
+   [alc.x-as-tests.impl.validate :as validate]
+   [clojure.java.io :as cji])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
 
 (defn -main
-  [& _]
-  (let [slurped (slurp *in*)]
-    (when-let [findings (validate/check-source slurped)]
-      (binding [*out* *err*]
-        (println "Errors detected in source")
-        (doseq [{:keys [message row]} findings]
-          (println "row:" row " - " message)))
-      (System/exit 1))
-    (print (rewrite/rewrite-with-tests slurped))
-    (flush)
-    (System/exit 0)))
+  [& args]
+  (if (= (first args) "test")
+    ;; XXX: draft
+    (let [full-path
+          (.getAbsolutePath (cji/file (System/getProperty "user.dir")
+                                      "src"))]
+      (runner/do-tests! [full-path]))
+    ;; generate test
+    (let [slurped (slurp *in*)]
+      (when-let [findings (validate/check-source slurped)]
+        (binding [*out* *err*]
+          (println "Errors detected in source")
+          (doseq [{:keys [message row]} findings]
+            (println "row:" row " - " message)))
+        (System/exit 1))
+      (print (rewrite/rewrite-with-tests slurped))))
+  (flush)
+  (System/exit 0))

@@ -1,6 +1,8 @@
 (ns alc.x-as-tests.impl.runner
   (:require
+   [alc.x-as-tests.impl.rewrite :as rewrite]
    [clojure.java.io :as cji]
+   [clojure.java.shell :as cjs]
    [clojure.string :as cs]))
 
 (defn enum-src-files-in-dir
@@ -9,6 +11,7 @@
            (keep (fn [file]
                    (when (.isFile file)
                      (let [path (.getAbsolutePath file)]
+                       ;; XXX: don't hard-wire?
                        (when (cs/ends-with? path ".clj")
                          path)))))))
 
@@ -53,6 +56,69 @@
 
   )
 
+(defn gen-test-path
+  [full-path root-path test-root]
+  (let [nio-full-path
+        (java.nio.file.Paths/get full-path
+                                 (into-array String []))
+        nio-root-path
+        (java.nio.file.Paths/get root-path
+                                 (into-array String []))]
+    (.getAbsolutePath (cji/file test-root
+                                (-> (.relativize nio-root-path
+                                                 nio-full-path)
+                                    .toString)))))
+
+(comment
+
+  (gen-test-path (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                             "src" "alc.x-as-tests"
+                                             "src" "alc" "x_as_tests"
+                                             "main.clj"))
+                 (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                             "src" "alc.x-as-tests"))
+                 "/tmp")
+  ;; => "/tmp/src/alc/x_as_tests/main.clj"
+
+
+  )
+
+;; XXX: generates test file paths and populates the corr files
+(defn gen-tests!
+  [paths dir test-root]
+  (->> paths
+       (map (fn [path]
+              (let [test-path (gen-test-path path dir test-root)
+                    _ (cji/make-parents test-path)
+                    src (slurp path)]
+                (spit test-path
+                      (rewrite/rewrite-with-tests src))
+                test-path)))
+       doall))
+
+(comment
+
+  (gen-tests! [(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                             "src" "alc.x-as-tests"
+                                             "src" "alc" "x_as_tests"
+                                             "main.clj"))]
+               (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                           "src" "alc.x-as-tests"
+                                           "src" "alc" "x_as_tests"))
+               "/tmp")
+  ;; => '("/tmp/main.clj")
+
+  (gen-tests! [(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                             "src" "alc.x-as-tests"
+                                             "src" "alc" "x_as_tests"
+                                             "main.clj"))]
+               (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                           "src" "alc.x-as-tests"))
+               "/tmp")
+  ;; => '("/tmp/src/alc/x_as_tests/main.clj")
+
+  )
+
 (comment
 
   (defmacro with-out-both
@@ -93,7 +159,7 @@
             "  \"-----------------------------------------------\")"
             ""
             "(binding [clojure.test/*test-out* *out*]"
-       (str "  (doseq [path " (with-out-str (prn paths)) "]")
+       (str "  (doseq [path " (with-out-str (prn (vec paths))) "]")
             "    (swap! summary conj"
             "           [path"
             "            (with-test-out-both"
@@ -143,5 +209,34 @@
      )
 
     )
+
+  )
+
+;; XXX: support filepaths too?
+;; XXX: pass test-root as parameter?
+(defn do-tests!
+  [dirs]
+  (let [paths (enum-src-files dirs)
+        ;; XXX: this is kind of broken -- return to fix it
+        test-paths (gen-tests! paths (first dirs) "/tmp")
+        ;; XXX: is this always correct?
+        proj-root (System/getProperty "user.dir")
+        ;; XXX: need temp name
+        schedule-path (.getAbsolutePath
+                       (cji/file proj-root "alc.xat.schedule.clj"))
+        _ (spit schedule-path (gen-run-schedule test-paths))
+        {:keys [:err :exit :out]}
+        (cjs/with-sh-dir (System/getenv "user.dir")
+          ;; XXX: existence check for "clojure" earlier?
+          (cjs/sh "clojure" "-i" schedule-path))]
+    (println "err:" err)
+    (println "exit:" exit)
+    ;; XXX: could check err and exit...
+    (println "out:" out)))
+
+(comment
+
+  (do-tests! [(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                          "src" "alc.x-as-tests" "src"))])
 
   )

@@ -1,0 +1,8 @@
+[
+ {
+  "name" : "java.io.File",
+  "allPublicMethods" : true,
+  "allPublicFields" : true,
+  "allPublicConstructors" : true
+ }
+]
