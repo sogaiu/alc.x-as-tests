@@ -890,32 +890,6 @@
 
   )
 
-(defn run-test-via-path
-  [path]
-  (eval (read-string (str "(do"
-                          (rewrite-with-tests (slurp path))
-                          ")"))))
-
-(comment
-
-  ;; don't want this running automatically
-  (comment
-
-    (def a-path
-      (str (System/getenv "HOME")
-           "/src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"))
-
-    (require 'clojure.test)
-
-    (binding [clojure.test/*test-out* *out*]
-      (let [original-ns (.name *ns*)]
-        (run-test-via-path a-path)
-        (in-ns original-ns)))
-
-    )
-
-  )
-
 (defn rewrite-without-non-comment-blocks
   [src]
   (let [nls (ast/first-form "\n\n")
@@ -1030,5 +1004,36 @@
   @clojure.test/*report-counters*)
 
 "
+
+  )
+
+;; XXX: this is experimental
+(defn run-test-via-path
+  [path]
+  (eval (read-string (str "(do"
+                          (rewrite-with-tests (slurp path))
+                          ")"))))
+
+(comment
+
+  ;; don't want this running automatically
+  (comment
+
+    (require '[clojure.java.io :as cji])
+
+    (def a-path
+      (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                  "src" "alc.x-as-tests" "src"
+                                  "alc" "x_as_tests" "impl"
+                                  "ast.clj")))
+
+    (require 'clojure.test)
+
+    (binding [clojure.test/*test-out* *out*]
+      (let [original-ns (.name *ns*)]
+        (run-test-via-path a-path)
+        (in-ns original-ns)))
+
+    )
 
   )
