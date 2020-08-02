@@ -26,3 +26,16 @@
   ;; => "/usr/bin/clojure"
 
   )
+
+(defn as-abspath
+  [& paths]
+  (.getAbsolutePath (apply cji/file paths)))
+
+(comment
+
+  (as-abspath (System/getProperty "user.dir")
+                    "src")
+  #_ (str (System/getProperty "user.dir") "/"
+          "src")
+
+  )

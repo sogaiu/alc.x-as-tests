@@ -1019,13 +1019,13 @@
   ;; don't want this running automatically
   (comment
 
-    (require '[clojure.java.io :as cji])
+    (require '[alc.x-as-tests.impl.paths :as paths])
 
     (def a-path
-      (.getAbsolutePath (cji/file (System/getenv "HOME")
-                                  "src" "alc.x-as-tests" "src"
-                                  "alc" "x_as_tests" "impl"
-                                  "ast.clj")))
+      (paths/as-abspath (System/getenv "HOME")
+                        "src" "alc.x-as-tests" "src"
+                        "alc" "x_as_tests" "impl"
+                        "ast.clj"))
 
     (require 'clojure.test)
 
