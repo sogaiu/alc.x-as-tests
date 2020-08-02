@@ -32,6 +32,8 @@
 ;; XXX: consider something like deep diff 2 for improving scannability
 ;;      of test output?
 ;;
+;; XXX: clean up test directory option?
+;;
 ;; XXX: some things appear not so straight-forward as expected values,
 ;;      e.g. anonymous functions, objects, etc.  some things don't matter
 ;;      may be (e.g. function values), but use predicates for others?
