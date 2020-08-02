@@ -226,13 +226,14 @@
            :temp-root]
     :or {paths [(paths/as-abspath (System/getProperty "user.dir")
                                   "src")]
-         temp-root (System/getProperty "java.io.tmpdir")}}]
+         temp-root (paths/as-abspath (System/getProperty "java.io.tmpdir")
+                                     (str "alc.x-as-tests-"
+                                          (System/currentTimeMillis)))}}]
   (assert (paths/which "clojure") "Failed to locate clojure")
   (let [paths (all-src-files paths)
         proj-root (System/getProperty "user.dir")
         test-paths (gen-tests! paths proj-root temp-root)
-        ;; XXX: need temp name
-        runner-path (paths/as-abspath proj-root
+        runner-path (paths/as-abspath temp-root
                                       "alc.xat.run-tests.clj")
         _ (spit runner-path (gen-run-schedule test-paths))
         {:keys [:err :exit :out]}
