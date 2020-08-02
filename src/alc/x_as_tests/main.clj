@@ -169,11 +169,8 @@
 (defn -main
   [& args]
   (if (= (first args) "test")
-    ;; XXX: draft
-    (let [full-path
-          (.getAbsolutePath (cji/file (System/getProperty "user.dir")
-                                      "src"))]
-      (runner/do-tests! [full-path]))
+    ;; XXX: draft -- allow specification of things from command line?
+    (runner/do-tests! {})
     ;; generate test
     (let [slurped (slurp *in*)]
       (when-let [findings (validate/check-source slurped)]

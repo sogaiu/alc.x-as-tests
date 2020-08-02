@@ -31,28 +31,70 @@
 
   )
 
-(defn enum-src-files
-  [dirs]
-  (distinct
-   (mapcat enum-src-files-in-dir
-           dirs)))
+(defn src-files-map
+  [dir]
+  (into {}
+        (map (fn [path]
+               [path dir])
+             (enum-src-files-in-dir dir))))
 
 (comment
 
-  (enum-src-files [(.getAbsolutePath (cji/file (System/getenv "HOME")
-                                               "src" "alc.x-as-tests" "src"
-                                               "alc" "x_as_tests"))
-                   (.getAbsolutePath (cji/file (System/getenv "HOME")
-                                               "src" "alc.x-as-tests" "src"
-                                               "alc" "x_as_tests" "impl"))])
-  #_ (map (fn [path]
-            (.getAbsolutePath (cji/file (System/getenv "HOME") path)))
-          ["src/alc.x-as-tests/src/alc/x_as_tests/impl/utils.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/validate.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/rewrite.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/runner.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/main.clj"])
+  (src-files-map
+   (.getAbsolutePath (cji/file (System/getenv "HOME")
+                               "src" "alc.x-as-tests" "src")))
+  #_ (let [root-path
+           (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                       "src" "alc.x-as-tests" "src"))]
+       (into {}
+             (map #(vector
+                    (.getAbsolutePath (cji/file root-path %))
+                    root-path)
+                  ["alc/x_as_tests/impl/utils.clj"
+                   "alc/x_as_tests/impl/ast.clj"
+                   "alc/x_as_tests/impl/validate.clj"
+                   "alc/x_as_tests/impl/rewrite.clj"
+                   "alc/x_as_tests/impl/runner.clj"
+                   "alc/x_as_tests/main.clj"])))
+
+  )
+
+(defn all-src-files
+  [dirs]
+  (apply merge
+         (map src-files-map
+              dirs)))
+
+(comment
+
+  (all-src-files
+   [(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                "src" "alc.x-as-tests" "src"
+                                "alc" "x_as_tests"))
+    (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                "src" "alc.x-as-tests" "src"
+                                "alc" "x_as_tests" "impl"))])
+  #_ (let [one-root
+           (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                       "src" "alc.x-as-tests" "src"
+                                       "alc" "x_as_tests"))
+           another-root
+           (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                       "src" "alc.x-as-tests" "src"
+                                       "alc" "x_as_tests" "impl"))]
+       (into {}
+             (concat (map #(vector
+                            (.getAbsolutePath (cji/file another-root %))
+                            another-root)
+                          ["utils.clj"
+                           "ast.clj"
+                           "validate.clj"
+                           "rewrite.clj"
+                           "runner.clj"])
+                     (map #(vector
+                            (.getAbsolutePath (cji/file one-root %))
+                            one-root)
+                          ["main.clj"]))))
 
   )
 
@@ -85,9 +127,9 @@
 
 ;; XXX: generates test file paths and populates the corr files
 (defn gen-tests!
-  [paths dir test-root]
-  (->> paths
-       (map (fn [path]
+  [paths-map test-root]
+  (->> paths-map
+       (map (fn [[path dir]]
               (let [test-path (gen-test-path path dir test-root)
                     _ (cji/make-parents test-path)
                     src (slurp path)]
@@ -98,24 +140,32 @@
 
 (comment
 
-  (gen-tests! [(.getAbsolutePath (cji/file (System/getenv "HOME")
-                                             "src" "alc.x-as-tests"
-                                             "src" "alc" "x_as_tests"
-                                             "main.clj"))]
-               (.getAbsolutePath (cji/file (System/getenv "HOME")
-                                           "src" "alc.x-as-tests"
-                                           "src" "alc" "x_as_tests"))
-               "/tmp")
+  ;; XXX: debris ends up in /tmp -- clean up?
+  (gen-tests!
+   (let [one-root
+         (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                     "src" "alc.x-as-tests" "src"
+                                     "alc" "x_as_tests"))]
+     {(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                  "src" "alc.x-as-tests" "src"
+                                  "alc" "x_as_tests"
+                                  "main.clj"))
+      one-root})
+   "/tmp")
   ;; => '("/tmp/main.clj")
 
-  (gen-tests! [(.getAbsolutePath (cji/file (System/getenv "HOME")
-                                             "src" "alc.x-as-tests"
-                                             "src" "alc" "x_as_tests"
-                                             "main.clj"))]
-               (.getAbsolutePath (cji/file (System/getenv "HOME")
-                                           "src" "alc.x-as-tests"))
-               "/tmp")
-  ;; => '("/tmp/src/alc/x_as_tests/main.clj")
+  ;; XXX: debris ends up in /tmp -- clean up?
+  (gen-tests!
+   (let [one-root
+         (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                     "src" "alc.x-as-tests" "src"))]
+     {(.getAbsolutePath (cji/file (System/getenv "HOME")
+                                  "src" "alc.x-as-tests" "src"
+                                  "alc" "x_as_tests"
+                                  "main.clj"))
+      one-root})
+   "/tmp")
+  ;; => '("/tmp/alc/x_as_tests/main.clj")
 
   )
 
@@ -213,13 +263,14 @@
   )
 
 ;; XXX: support filepaths too?
-;; XXX: pass test-root as parameter?
 (defn do-tests!
-  [dirs]
-  (let [paths (enum-src-files dirs)
-        ;; XXX: this is kind of broken -- return to fix it
-        test-paths (gen-tests! paths (first dirs) "/tmp")
-        ;; XXX: is this always correct?
+  [{:keys [:dirs
+           :temp-root]
+    :or {dirs [(.getAbsolutePath
+                (cji/file (System/getProperty "user.dir") "src"))]
+         temp-root (System/getProperty "java.io.tmpdir")}}]
+  (let [paths-map (all-src-files dirs)
+        test-paths (gen-tests! paths-map temp-root)
         proj-root (System/getProperty "user.dir")
         ;; XXX: need temp name
         schedule-path (.getAbsolutePath
