@@ -1,17 +1,5 @@
 ;; TODO
 ;;
-;; XXX: reconsider some of the tests that depend on specific files being
-;;      at certain absolute paths as well as there being particular
-;;      files (e.g. exactly which source files exist for this project)
-;;
-;; XXX: support for just getting transformed comment block content --
-;;      i.e.  don't output the originally uncommented portions.  this
-;;      might be useful for use at the repl being used via "load-file"
-;;      or just sent as a string.
-;;
-;; XXX: try to spell out some ideas about how to generate and trigger
-;;      tests for all .clj files in a project.
-;;
 ;; XXX: whether and how to support cljs.  there are multiple cljs
 ;;      runtimes, so the idea of "supporting cljs" is not specific
 ;;      enough.  try to spell out some more specifics.
