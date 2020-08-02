@@ -223,7 +223,8 @@
 
 (defn do-tests!
   [{:keys [:paths
-           :temp-root]
+           :temp-root
+           :verbose]
     :or {paths [(paths/as-abspath (System/getProperty "user.dir")
                                   "src")]
          temp-root (paths/as-abspath (System/getProperty "java.io.tmpdir")
@@ -236,20 +237,23 @@
         runner-path (paths/as-abspath temp-root
                                       "alc.xat.run-tests.clj")
         _ (spit runner-path (gen-run-schedule test-paths))
+        cmd ["clojure" "-i" runner-path]
         {:keys [:err :exit :out]}
         (cjs/with-sh-dir proj-root
-          (cjs/sh "clojure" "-i" runner-path))]
-    ;; XXX
-    (println "err:" err)
-    (println "exit:" exit)
-    ;; XXX: could check err and exit...
-    (println "out:" out)))
+          (apply cjs/sh cmd))]
+    (when verbose
+      (println cmd))
+    (when (not= 0 exit)
+      (println cmd)
+      (println "  exit:" exit)
+      (println "  err:" err))
+    (println out)))
 
 (comment
 
   (comment
 
-    (do-tests! {})
+    (do-tests! {:verbose true})
 
     )
 
