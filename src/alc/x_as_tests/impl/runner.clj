@@ -284,8 +284,8 @@
         _ (spit schedule-path (gen-run-schedule test-paths))
         {:keys [:err :exit :out]}
         (cjs/with-sh-dir (System/getenv "user.dir")
-          ;; XXX: existence check for "clojure" earlier?
           (cjs/sh "clojure" "-i" schedule-path))]
+    ;; XXX
     (println "err:" err)
     (println "exit:" exit)
     ;; XXX: could check err and exit...
