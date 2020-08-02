@@ -134,6 +134,9 @@
 ;; * recurring issue of trying to arrange for concise illustrative
 ;;   values for inputs and outputs in tests / examples
 ;;
+;; * writing platform-independent tests tends to increases complexity,
+;;   often takes longer, and may make code harder to read.
+;;
 ;; * parcera returns things that look almost like hiccup
 ;;
 ;; * parcera/code can be fed hiccup
