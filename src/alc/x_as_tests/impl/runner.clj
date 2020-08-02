@@ -257,4 +257,14 @@
 
     )
 
+  (comment
+
+    (let [impl-dir (paths/as-abspath (System/getProperty "user.dir")
+                                     "src" "alc" "x_as_tests" "impl")]
+      (do-tests! {:verbose true
+                  :paths [(paths/as-abspath impl-dir "ast.clj")
+                          (paths/as-abspath impl-dir "rewrite.clj")]}))
+
+    )
+
   )
