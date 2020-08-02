@@ -1,5 +1,7 @@
 ;; TODO
 ;;
+;; XXX: document runner in README
+;;
 ;; XXX: whether and how to support cljs.  there are multiple cljs
 ;;      runtimes, so the idea of "supporting cljs" is not specific
 ;;      enough.  try to spell out some more specifics.
