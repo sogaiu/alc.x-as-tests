@@ -160,7 +160,8 @@
 
 (ns alc.x-as-tests.main
   (:require
-   [alc.x-as-tests.impl.rewrite :as rewrite]
+   [alc.x-as-tests.impl.rewrite.clojure :as rwclj]
+   #_[alc.x-as-tests.impl.rewrite.clojurescript :as rwcljs]
    [alc.x-as-tests.impl.runner :as runner]
    [alc.x-as-tests.impl.validate :as validate])
   (:gen-class))
@@ -180,6 +181,6 @@
           (doseq [{:keys [message row]} findings]
             (println "row:" row " - " message)))
         (System/exit 1))
-      (print (rewrite/rewrite-with-tests slurped))))
+      (print (rwclj/rewrite-with-tests slurped))))
   (flush)
   (System/exit 0))

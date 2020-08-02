@@ -1,7 +1,8 @@
 (ns alc.x-as-tests.impl.runner
   (:require
    [alc.x-as-tests.impl.paths :as paths]
-   [alc.x-as-tests.impl.rewrite :as rewrite]
+   ;; XXX
+   [alc.x-as-tests.impl.rewrite.clojure :as rewrite]
    [clojure.java.io :as cji]
    [clojure.java.shell :as cjs]
    [clojure.string :as cs]))
@@ -29,7 +30,8 @@
                                path))
            ["impl/ast.clj"
             "impl/paths.clj"
-            "impl/rewrite.clj"
+            "impl/rewrite/clojure.clj"
+            "impl/rewrite/core.clj"
             "impl/runner.clj"
             "impl/utils.clj"
             "impl/validate.clj"
