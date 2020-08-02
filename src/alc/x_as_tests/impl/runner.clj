@@ -7,13 +7,12 @@
    [clojure.string :as cs]))
 
 (defn enum-src-files-in-dir
-  [dir]
+  [dir exts]
   (some->> (file-seq (java.io.File. dir))
            (keep (fn [file]
                    (when (.isFile file)
                      (let [path (paths/as-abspath file)]
-                       ;; XXX: don't hard-wire?
-                       (when (cs/ends-with? path ".clj")
+                       (when (paths/has-filext? path exts)
                          path)))))))
 
 (comment
@@ -21,22 +20,25 @@
   (set
    (enum-src-files-in-dir
     (paths/as-abspath (System/getProperty "user.dir")
-                      "src")))
+                      "src")
+    #{".clj"}))
   #_ (set
       (map (fn [path]
-             (paths/as-abspath (System/getProperty "user.dir") path))
-           ["src/alc/x_as_tests/impl/utils.clj"
-            "src/alc/x_as_tests/impl/ast.clj"
-            "src/alc/x_as_tests/impl/validate.clj"
-            "src/alc/x_as_tests/impl/paths.clj"
-            "src/alc/x_as_tests/impl/rewrite.clj"
-            "src/alc/x_as_tests/impl/runner.clj"
-            "src/alc/x_as_tests/main.clj"]))
+             (paths/as-abspath (System/getProperty "user.dir")
+                               "src" "alc" "x_as_tests"
+                               path))
+           ["impl/ast.clj"
+            "impl/paths.clj"
+            "impl/rewrite.clj"
+            "impl/runner.clj"
+            "impl/utils.clj"
+            "impl/validate.clj"
+            "main.clj"]))
 
   )
 
 (defn all-src-files
-  [paths]
+  [paths exts]
   (reduce (fn [acc path]
             (let [f (cji/file path)]
               (cond
@@ -44,7 +46,7 @@
                 (conj acc path)
                 ;;
                 (.isDirectory f)
-                (into acc (vec (enum-src-files-in-dir path)))
+                (into acc (vec (enum-src-files-in-dir path exts)))
                 ;;
                 :else
                 (throw (Exception. (str "not file or dir: " path))))))
@@ -58,7 +60,8 @@
     [(paths/as-abspath (System/getProperty "user.dir")
                        "src" "alc" "x_as_tests" "main.clj")
      (paths/as-abspath (System/getProperty "user.dir")
-                       "src" "alc" "x_as_tests" "impl")]))
+                       "src" "alc" "x_as_tests" "impl")]
+    #{".clj"}))
   #_ (->> (cji/file (System/getProperty "user.dir")
                     "src")
           file-seq
@@ -222,16 +225,18 @@
   )
 
 (defn do-tests!
-  [{:keys [:paths
+  [{:keys [:exts
+           :paths
            :temp-root
            :verbose]
-    :or {paths [(paths/as-abspath (System/getProperty "user.dir")
+    :or {exts #{".clj" ".cljc"}
+         paths [(paths/as-abspath (System/getProperty "user.dir")
                                   "src")]
          temp-root (paths/as-abspath (System/getProperty "java.io.tmpdir")
                                      (str "alc.x-as-tests-"
                                           (System/currentTimeMillis)))}}]
   (assert (paths/which "clojure") "Failed to locate clojure")
-  (let [paths (all-src-files paths)
+  (let [paths (all-src-files paths exts)
         proj-root (System/getProperty "user.dir")
         test-paths (gen-tests! paths proj-root temp-root)
         runner-path (paths/as-abspath temp-root

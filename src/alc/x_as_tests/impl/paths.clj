@@ -39,3 +39,24 @@
           "src")
 
   )
+
+(defn has-filext?
+  [path exts]
+  (some #(cs/ends-with? path %)
+        exts))
+
+(comment
+
+  (has-filext? (as-abspath (System/getProperty "user.dir")
+                           "src" "alc" "x_as_tests"
+                           "main.clj")
+               #{".clj" ".cljc"})
+  ;; => true
+
+  (has-filext? (as-abspath (System/getProperty "user.dir")
+                           "src" "alc" "x_as_tests"
+                           "main.cljs")
+               #{".clj"})
+  ;; => nil
+
+  )
