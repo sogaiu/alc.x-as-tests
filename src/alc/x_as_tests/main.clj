@@ -160,8 +160,7 @@
   (:require
    [alc.x-as-tests.impl.rewrite :as rewrite]
    [alc.x-as-tests.impl.runner :as runner]
-   [alc.x-as-tests.impl.validate :as validate]
-   [clojure.java.io :as cji])
+   [alc.x-as-tests.impl.validate :as validate])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
