@@ -1022,9 +1022,8 @@
     (require '[alc.x-as-tests.impl.paths :as paths])
 
     (def a-path
-      (paths/as-abspath (System/getenv "HOME")
-                        "src" "alc.x-as-tests" "src"
-                        "alc" "x_as_tests" "impl"
+      (paths/as-abspath (System/getProperty "user.dir")
+                        "src" "alc" "x_as_tests" "impl"
                         "ast.clj"))
 
     (require 'clojure.test)

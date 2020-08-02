@@ -18,88 +18,53 @@
 
 (comment
 
-  (set (enum-src-files-in-dir
-        (paths/as-abspath (System/getenv "HOME")
-                          "src" "alc.x-as-tests" "src")))
+  (set
+   (enum-src-files-in-dir
+    (paths/as-abspath (System/getProperty "user.dir")
+                      "src")))
   #_ (set
       (map (fn [path]
-             (paths/as-abspath (System/getenv "HOME") path))
-           ["src/alc.x-as-tests/src/alc/x_as_tests/impl/utils.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/impl/validate.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/impl/paths.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/impl/rewrite.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/impl/runner.clj"
-            "src/alc.x-as-tests/src/alc/x_as_tests/main.clj"]))
-
-  )
-
-(defn src-files-map
-  [dir]
-  (into {}
-        (map (fn [path]
-               [path dir])
-             (enum-src-files-in-dir dir))))
-
-(comment
-
-  (src-files-map
-   (paths/as-abspath (System/getenv "HOME")
-                     "src" "alc.x-as-tests" "src"))
-  #_ (let [root-path
-           (paths/as-abspath (System/getenv "HOME")
-                             "src" "alc.x-as-tests" "src")]
-       (into {}
-             (map #(vector
-                    (paths/as-abspath root-path %)
-                    root-path)
-                  ["alc/x_as_tests/impl/utils.clj"
-                   "alc/x_as_tests/impl/ast.clj"
-                   "alc/x_as_tests/impl/validate.clj"
-                   "alc/x_as_tests/impl/paths.clj"
-                   "alc/x_as_tests/impl/rewrite.clj"
-                   "alc/x_as_tests/impl/runner.clj"
-                   "alc/x_as_tests/main.clj"])))
+             (paths/as-abspath (System/getProperty "user.dir") path))
+           ["src/alc/x_as_tests/impl/utils.clj"
+            "src/alc/x_as_tests/impl/ast.clj"
+            "src/alc/x_as_tests/impl/validate.clj"
+            "src/alc/x_as_tests/impl/paths.clj"
+            "src/alc/x_as_tests/impl/rewrite.clj"
+            "src/alc/x_as_tests/impl/runner.clj"
+            "src/alc/x_as_tests/main.clj"]))
 
   )
 
 (defn all-src-files
-  [dirs]
-  (apply merge
-         (map src-files-map
-              dirs)))
+  [paths]
+  (reduce (fn [acc path]
+            (let [f (cji/file path)]
+              (cond
+                (.isFile f)
+                (conj acc path)
+                ;;
+                (.isDirectory f)
+                (into acc (vec (enum-src-files-in-dir path)))
+                ;;
+                :else
+                (throw (Exception. (str "not file or dir: " path))))))
+          []
+          paths))
 
 (comment
 
-  (all-src-files
-   [(paths/as-abspath (System/getenv "HOME")
-                      "src" "alc.x-as-tests" "src"
-                      "alc" "x_as_tests")
-    (paths/as-abspath (System/getenv "HOME")
-                      "src" "alc.x-as-tests" "src"
-                      "alc" "x_as_tests" "impl")])
-  #_ (let [one-root
-           (paths/as-abspath (System/getenv "HOME")
-                             "src" "alc.x-as-tests" "src"
-                             "alc" "x_as_tests")
-           another-root
-           (paths/as-abspath (System/getenv "HOME")
-                             "src" "alc.x-as-tests" "src"
-                             "alc" "x_as_tests" "impl")]
-       (into {}
-             (concat (map #(vector
-                            (paths/as-abspath another-root %)
-                            another-root)
-                          ["utils.clj"
-                           "ast.clj"
-                           "validate.clj"
-                           "paths.clj"
-                           "rewrite.clj"
-                           "runner.clj"])
-                     (map #(vector
-                            (paths/as-abspath one-root %)
-                            one-root)
-                          ["main.clj"]))))
+  (set
+   (all-src-files
+    [(paths/as-abspath (System/getProperty "user.dir")
+                       "src" "alc" "x_as_tests" "main.clj")
+     (paths/as-abspath (System/getProperty "user.dir")
+                       "src" "alc" "x_as_tests" "impl")]))
+  #_ (->> (cji/file (System/getProperty "user.dir")
+                    "src")
+          file-seq
+          (filter #(.isFile %))
+          (map #(.getAbsolutePath %))
+          set)
 
   )
 
@@ -118,24 +83,25 @@
 
 (comment
 
-  (gen-test-path (paths/as-abspath (System/getenv "HOME")
-                                   "src" "alc.x-as-tests"
-                                   "src" "alc" "x_as_tests"
-                                   "main.clj")
-                 (paths/as-abspath (System/getenv "HOME")
-                                   "src" "alc.x-as-tests")
-                 "/tmp")
-  ;; => "/tmp/src/alc/x_as_tests/main.clj"
-
+  (let [proj-root (System/getProperty "user.dir")]
+    (gen-test-path (paths/as-abspath proj-root
+                                     "src" "alc" "x_as_tests"
+                                     "main.clj")
+                   (paths/as-abspath proj-root
+                                     "src")
+                   (System/getProperty "java.io.tmpdir")))
+  #_ (paths/as-abspath (System/getProperty "java.io.tmpdir")
+                       "alc" "x_as_tests"
+                       "main.clj")
 
   )
 
 ;; XXX: generates test file paths and populates the corr files
 (defn gen-tests!
-  [paths-map test-root]
-  (->> paths-map
-       (map (fn [[path dir]]
-              (let [test-path (gen-test-path path dir test-root)
+  [paths relative-to test-root]
+  (->> paths
+       (map (fn [path]
+              (let [test-path (gen-test-path path relative-to test-root)
                     _ (cji/make-parents test-path)
                     src (slurp path)]
                 (spit test-path
@@ -146,31 +112,19 @@
 (comment
 
   ;; XXX: debris ends up in /tmp -- clean up?
-  (gen-tests!
-   (let [one-root
-         (paths/as-abspath (System/getenv "HOME")
-                           "src" "alc.x-as-tests" "src"
-                           "alc" "x_as_tests")]
-     {(paths/as-abspath (System/getenv "HOME")
-                        "src" "alc.x-as-tests" "src"
-                        "alc" "x_as_tests"
-                        "main.clj")
-      one-root})
-   "/tmp")
-  ;; => '("/tmp/main.clj")
-
-  ;; XXX: debris ends up in /tmp -- clean up?
-  (gen-tests!
-   (let [one-root
-         (paths/as-abspath (System/getenv "HOME")
-                           "src" "alc.x-as-tests" "src")]
-     {(paths/as-abspath (System/getenv "HOME")
-                        "src" "alc.x-as-tests" "src"
-                        "alc" "x_as_tests"
-                        "main.clj")
-      one-root})
-   "/tmp")
-  ;; => '("/tmp/alc/x_as_tests/main.clj")
+  (let [proj-root (System/getProperty "user.dir")]
+    (gen-tests!
+     [(paths/as-abspath proj-root
+                        "src" "alc" "x_as_tests"
+                        "main.clj")]
+     (paths/as-abspath proj-root
+                       "src")
+     (paths/as-abspath (System/getProperty "java.io.tmpdir")
+                       "alc.x-as-tests" "src")))
+  #_ [(paths/as-abspath (System/getProperty "java.io.tmpdir")
+                        "alc.x-as-tests"
+                        "src" "alc" "x_as_tests"
+                        "main.clj")]
 
   )
 
@@ -257,11 +211,9 @@
   (comment
 
     (print
-     (gen-run-schedule [(paths/as-abspath (System/getenv "HOME")
-                                          "src" "alc.x-as-tests"
+     (gen-run-schedule [(paths/as-abspath (System/getProperty "user.dir")
                                           "fin.clj")
-                        (paths/as-abspath (System/getenv "HOME")
-                                          "src" "alc.x-as-tests"
+                        (paths/as-abspath (System/getProperty "user.dir")
                                           "fun.clj")])
      )
 
@@ -269,17 +221,16 @@
 
   )
 
-;; XXX: support filepaths too?
 (defn do-tests!
-  [{:keys [:dirs
+  [{:keys [:paths
            :temp-root]
-    :or {dirs [(paths/as-abspath (System/getProperty "user.dir")
-                                 "src")]
+    :or {paths [(paths/as-abspath (System/getProperty "user.dir")
+                                  "src")]
          temp-root (System/getProperty "java.io.tmpdir")}}]
   (assert (paths/which "clojure") "Failed to locate clojure")
-  (let [paths-map (all-src-files dirs)
-        test-paths (gen-tests! paths-map temp-root)
+  (let [paths (all-src-files paths)
         proj-root (System/getProperty "user.dir")
+        test-paths (gen-tests! paths proj-root temp-root)
         ;; XXX: need temp name
         runner-path (paths/as-abspath proj-root
                                       "alc.xat.run-tests.clj")
@@ -295,7 +246,10 @@
 
 (comment
 
-  (do-tests! [(paths/as-abspath (System/getenv "HOME")
-                                "src" "alc.x-as-tests" "src")])
+  (comment
+
+    (do-tests! {})
+
+    )
 
   )
