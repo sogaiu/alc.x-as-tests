@@ -1,5 +1,6 @@
 (ns alc.x-as-tests.impl.runner
   (:require
+   [alc.x-as-tests.impl.paths :as paths]
    [alc.x-as-tests.impl.rewrite :as rewrite]
    [clojure.java.io :as cji]
    [clojure.java.shell :as cjs]
@@ -17,17 +18,19 @@
 
 (comment
 
-  (enum-src-files-in-dir
-   (.getAbsolutePath (cji/file (System/getenv "HOME")
-                               "src" "alc.x-as-tests" "src")))
-  #_ (map (fn [path]
-            (.getAbsolutePath (cji/file (System/getenv "HOME") path)))
-          ["src/alc.x-as-tests/src/alc/x_as_tests/impl/utils.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/validate.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/rewrite.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/impl/runner.clj"
-           "src/alc.x-as-tests/src/alc/x_as_tests/main.clj"])
+  (set (enum-src-files-in-dir
+        (.getAbsolutePath (cji/file (System/getenv "HOME")
+                                    "src" "alc.x-as-tests" "src"))))
+  #_ (set
+      (map (fn [path]
+             (.getAbsolutePath (cji/file (System/getenv "HOME") path)))
+           ["src/alc.x-as-tests/src/alc/x_as_tests/impl/utils.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/impl/ast.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/impl/validate.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/impl/paths.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/impl/rewrite.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/impl/runner.clj"
+            "src/alc.x-as-tests/src/alc/x_as_tests/main.clj"]))
 
   )
 
@@ -53,6 +56,7 @@
                   ["alc/x_as_tests/impl/utils.clj"
                    "alc/x_as_tests/impl/ast.clj"
                    "alc/x_as_tests/impl/validate.clj"
+                   "alc/x_as_tests/impl/paths.clj"
                    "alc/x_as_tests/impl/rewrite.clj"
                    "alc/x_as_tests/impl/runner.clj"
                    "alc/x_as_tests/main.clj"])))
@@ -89,6 +93,7 @@
                           ["utils.clj"
                            "ast.clj"
                            "validate.clj"
+                           "paths.clj"
                            "rewrite.clj"
                            "runner.clj"])
                      (map #(vector
@@ -269,6 +274,7 @@
     :or {dirs [(.getAbsolutePath
                 (cji/file (System/getProperty "user.dir") "src"))]
          temp-root (System/getProperty "java.io.tmpdir")}}]
+  (assert (paths/which "clojure") "Failed to locate clojure")
   (let [paths-map (all-src-files dirs)
         test-paths (gen-tests! paths-map temp-root)
         proj-root (System/getProperty "user.dir")
