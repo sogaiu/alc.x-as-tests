@@ -493,11 +493,11 @@
    ;; XXX: not so great for maintenance?
    (cs/join "\n"
             ["(->> (keys (ns-interns *ns*))"
-             "     (filter (fn [test-name]"
+             "     (filter (fn [test-sym]"
              "       (re-matches #\"^test-at-line-.*\""
-             "         (name test-name))))"
-             "     (run! (fn [test-name]"
-             "             (ns-unmap *ns* test-name))))"])))
+             "         (name test-sym))))"
+             "     (run! (fn [test-sym]"
+             "             (ns-unmap *ns* test-sym))))"])))
 
 (comment
 
@@ -512,11 +512,11 @@
   (ast/to-str [(remove-existing-tests-form)])
   #_
   "(->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))"
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))"
 
   )
 
@@ -797,11 +797,11 @@
   #_ "(ns my.ns)
 
 (->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))
 
 (require 'clojure.test)
 
@@ -852,11 +852,11 @@
   #_ "(in-ns 'my.ns)
 
 (->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))
 
 (require 'clojure.test)
 
@@ -905,11 +905,11 @@
   #_ "
 
 (->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))
 
 (require 'clojure.test)
 
@@ -980,11 +980,11 @@
   #_ "
 
 (->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))
 
 (require 'clojure.test)
 
@@ -1036,11 +1036,11 @@
   #_ "
 
 (->> (keys (ns-interns *ns*))
-     (filter (fn [test-name]
+     (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
-         (name test-name))))
-     (run! (fn [test-name]
-             (ns-unmap *ns* test-name))))
+         (name test-sym))))
+     (run! (fn [test-sym]
+             (ns-unmap *ns* test-sym))))
 
 (require 'clojure.test)
 
