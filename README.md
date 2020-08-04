@@ -45,7 +45,7 @@ Generate a file with tests for `fun.clj` and execute them by:
 
 ```
 $ cd ~/a-clj-proj-dir
-$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}}' -m alc.x-as-tests.main | clj -
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}}' -m alc.x-as-tests.main | clj -
 ```
 
 See [here](doc/lein-and-boot.md) for some more details including use
@@ -68,7 +68,7 @@ like:
  {
   :extra-deps {sogaiu/alc.x-as-tests
                 {:git/url "https://github.com/sogaiu/alc.x-as-tests"
-                 :sha "d4b001fe5abe8f1c7b2244f17001064fad1c5135"}}
+                 :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}
   :main-opts ["-m" "alc.x-as-tests.main"]
  }
 ```
