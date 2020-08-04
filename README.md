@@ -92,7 +92,6 @@ To run the tests (in e.g. `fun-with-tests.clj`) with `clj`:
 
 ```
 $ clj -i fun-with-tests.clj
-{:test 55, :pass 55, :fail 0, :error 0}
 ```
 
 To generate and run in one invocation with `clj`:
