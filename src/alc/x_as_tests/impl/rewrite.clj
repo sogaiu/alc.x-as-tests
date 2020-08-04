@@ -538,12 +538,19 @@
                   "          (ref clojure.test/*initial-report-counters*)]"
                   "  (clojure.test/do-report"
                   "    (clojure.test/test-vars"
-                  "      (keep"
-                  "        (fn [test-name]"
-                  "          (when (re-matches #\"^test-at-line-.*\""
-                  "                  (name test-name))"
-                  "            (intern *ns* (symbol test-name))))"
-                  "        (sort (keys (ns-interns *ns*))))))"
+                  "      (->> (keys (ns-interns *ns*))"
+                  "           (keep"
+                  "             (fn [test-sym]"
+                  "               (let [[_ test-num]"
+                  "                     (re-matches #\"^test-at-line-(.*)\""
+                  "                                 (name test-sym))]"
+                  "                 (when test-num"
+                  "                   [(Integer. test-num)"
+                  "                    (intern *ns* test-sym)]))))"
+                  "           (sort-by"
+                  "             (fn [[num test-var]]"
+                  "               num))"
+                  "           (map second))))"
                   "  @clojure.test/*report-counters*)"])))
 
 (comment
@@ -563,35 +570,62 @@
         (:list
          (:symbol "clojure.test/test-vars") (:whitespace "\n      ")
          (:list
-          (:symbol "keep") (:whitespace "\n        ")
+          (:symbol "->>") (:whitespace " ")
           (:list
-           (:symbol "fn") (:whitespace " ")
-           (:vector
-            (:symbol "test-name")) (:whitespace "\n          ")
+           (:symbol "keys") (:whitespace " ")
            (:list
-            (:symbol "when") (:whitespace " ")
-            (:list
-             (:symbol "re-matches") (:whitespace " ")
-             (:regex "\"^test-at-line-.*\"")
-             (:whitespace "\n                  ")
-             (:list
-              (:symbol "name") (:whitespace " ")
-              (:symbol "test-name")))
-            (:whitespace "\n            ")
-            (:list
-             (:symbol "intern") (:whitespace " ")
-             (:symbol "*ns*") (:whitespace " ")
-             (:list
-              (:symbol "symbol") (:whitespace " ")
-              (:symbol "test-name")))))
-          (:whitespace "\n        ")
+            (:symbol "ns-interns") (:whitespace " ")
+            (:symbol "*ns*")))
+          (:whitespace "\n           ")
           (:list
-           (:symbol "sort") (:whitespace " ")
+           (:symbol "keep") (:whitespace "\n             ")
            (:list
-            (:symbol "keys") (:whitespace " ")
+            (:symbol "fn") (:whitespace " ")
+            (:vector
+             (:symbol "test-sym"))
+            (:whitespace "\n               ")
             (:list
-             (:symbol "ns-interns") (:whitespace " ")
-             (:symbol "*ns*")))))))
+             (:symbol "let") (:whitespace " ")
+             (:vector
+              (:vector
+               (:symbol "_") (:whitespace " ")
+               (:symbol "test-num"))
+              (:whitespace "\n                     ")
+              (:list
+               (:symbol "re-matches") (:whitespace " ")
+               (:regex "\"^test-at-line-(.*)\"")
+               (:whitespace "\n                                 ")
+               (:list
+                (:symbol "name") (:whitespace " ")
+                (:symbol "test-sym"))))
+             (:whitespace "\n                 ")
+             (:list
+              (:symbol "when") (:whitespace " ")
+              (:symbol "test-num") (:whitespace "\n                   ")
+              (:vector
+               (:list
+                (:symbol "Integer.") (:whitespace " ")
+                (:symbol "test-num"))
+               (:whitespace "\n                    ")
+               (:list
+                (:symbol "intern") (:whitespace " ")
+                (:symbol "*ns*") (:whitespace " ")
+                (:symbol "test-sym")))))))
+          (:whitespace "\n           ")
+          (:list
+           (:symbol "sort-by") (:whitespace "\n             ")
+           (:list
+            (:symbol "fn") (:whitespace " ")
+            (:vector
+             (:vector
+              (:symbol "num") (:whitespace " ")
+              (:symbol "test-var")))
+            (:whitespace "\n               ")
+            (:symbol "num")))
+          (:whitespace "\n           ")
+          (:list
+           (:symbol "map") (:whitespace " ")
+           (:symbol "second")))))
        (:whitespace "\n  ")
        (:deref
         (:symbol "clojure.test/*report-counters*")))
@@ -784,12 +818,19 @@
           (ref clojure.test/*initial-report-counters*)]
   (clojure.test/do-report
     (clojure.test/test-vars
-      (keep
-        (fn [test-name]
-          (when (re-matches #\"^test-at-line-.*\"
-                  (name test-name))
-            (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*))))))
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
   @clojure.test/*report-counters*)
 
 "
@@ -832,12 +873,19 @@
           (ref clojure.test/*initial-report-counters*)]
   (clojure.test/do-report
     (clojure.test/test-vars
-      (keep
-        (fn [test-name]
-          (when (re-matches #\"^test-at-line-.*\"
-                  (name test-name))
-            (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*))))))
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
   @clojure.test/*report-counters*)
 
 "
@@ -878,12 +926,19 @@
           (ref clojure.test/*initial-report-counters*)]
   (clojure.test/do-report
     (clojure.test/test-vars
-      (keep
-        (fn [test-name]
-          (when (re-matches #\"^test-at-line-.*\"
-                  (name test-name))
-            (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*))))))
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
   @clojure.test/*report-counters*)
 
 "
@@ -946,12 +1001,19 @@
           (ref clojure.test/*initial-report-counters*)]
   (clojure.test/do-report
     (clojure.test/test-vars
-      (keep
-        (fn [test-name]
-          (when (re-matches #\"^test-at-line-.*\"
-                  (name test-name))
-            (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*))))))
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
   @clojure.test/*report-counters*)
 
 "
@@ -995,12 +1057,19 @@
           (ref clojure.test/*initial-report-counters*)]
   (clojure.test/do-report
     (clojure.test/test-vars
-      (keep
-        (fn [test-name]
-          (when (re-matches #\"^test-at-line-.*\"
-                  (name test-name))
-            (intern *ns* (symbol test-name))))
-        (sort (keys (ns-interns *ns*))))))
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
   @clojure.test/*report-counters*)
 
 "
