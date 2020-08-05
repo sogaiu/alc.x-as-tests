@@ -10,17 +10,15 @@
 
 (comment
 
-  (last-non-whitespace
-   '((:whitespace " ")
-     (:number "1")))
-  ;; => [:number "1"]
+  (last-non-whitespace [(ast/first-form " ")
+                        (ast/first-form "1")])
+  ;; => (ast/first-form "1")
 
-  (last-non-whitespace
-   '((:keyword ":b")
-     (:whitespace "\n")))
-  ;; => [:keyword ":b"]
+  (last-non-whitespace [(ast/first-form ":b")
+                        (ast/first-form "\n")])
+  ;; => (ast/first-form ":b")
 
-  (last-non-whitespace '())
+  (last-non-whitespace [])
   ;; => nil
 
   )
@@ -32,10 +30,9 @@
 
 (comment
 
-  (create-deftest-opening "test-at-line-7650")
-  #_ '[:list
-       (:symbol "clojure.test/deftest") (:whitespace " ")
-       (:symbol "test-at-line-7650")]
+  (ast/to-str
+   [(create-deftest-opening "test-at-line-7650")])
+  ;; => "(clojure.test/deftest test-at-line-7650)"
 
   )
 
@@ -53,16 +50,13 @@
 
 (comment
 
-  (rewrite-expected '(:comment ";; => 2"))
-  ;; => [:number "2"]
+  (ast/to-str
+   [(rewrite-expected (ast/first-form ";; => 2"))])
+  ;; => "2"
 
-  (rewrite-expected '(:discard
-                      (:whitespace " ")
-                      (:map (:keyword ":a") (:whitespace " ")
-                            (:symbol "a"))))
-  #_ '(:map
-       (:keyword ":a") (:whitespace " ")
-       (:symbol "a"))
+  (ast/to-str
+   [(rewrite-expected (ast/first-form "#_ {:a a}"))])
+  ;; => "{:a a}"
 
   )
 
@@ -76,18 +70,10 @@
 
 (comment
 
-  (create-equals-form '(:comment ";; => 2")
-                      '(:list
-                        (:symbol "+") (:whitespace " ")
-                        (:number "1") (:whitespace " ")
-                        (:number "1")))
-  #_ '[:list
-       [:symbol "="] [:whitespace " "]
-       (:number "2") [:whitespace " "]
-       (:list
-        (:symbol "+") (:whitespace " ")
-        (:number "1") (:whitespace " ")
-        (:number "1"))]
+  (ast/to-str
+   [(create-equals-form (ast/first-form ";; => 2")
+                        (ast/first-form "(+ 1 1)"))])
+  ;; => "(= 2 (+ 1 1))"
 
   )
 
@@ -98,20 +84,10 @@
 
 (comment
 
-  (create-is-form '(:list
-                     (:symbol "+") (:whitespace " ")
-                     (:number "1") (:whitespace " ")
-                     (:number "1"))
-                   '(:comment ";; => 2"))
-  #_ '[:list
-       [:symbol "clojure.test/is"] [:whitespace " "]
-       [:list
-        [:symbol "="] [:whitespace " "]
-        (:number "2") [:whitespace " "]
-        (:list
-         (:symbol "+") (:whitespace " ")
-         (:number "1") (:whitespace " ")
-         (:number "1"))]]
+  (ast/to-str
+   [(create-is-form (ast/first-form "(+ 1 1)")
+                    (ast/first-form ";; => 2"))])
+  ;; => "(clojure.test/is (= 2 (+ 1 1)))"
 
  )
 
@@ -129,21 +105,13 @@
 
 (comment
 
-  (ast/first-form
-   (str "(clojure.test/deftest name-of-test\n"
-        "  (clojure.test/is (= 4 (+ 2 2))))"))
-  #_ '(:list
-       (:symbol "clojure.test/deftest") (:whitespace " ")
-       (:symbol "name-of-test") (:whitespace "\n  ")
-       (:list
-        (:symbol "clojure.test/is") (:whitespace " ")
-        (:list
-         (:symbol "=") (:whitespace " ")
-         (:number "4") (:whitespace " ")
-         (:list
-          (:symbol "+") (:whitespace " ")
-          (:number "2") (:whitespace " ")
-          (:number "2")))))
+  (ast/to-str
+   [(ast/first-form
+     (str "(clojure.test/deftest name-of-test\n"
+          "  (clojure.test/is (= 4 (+ 2 2))))"))])
+  #_
+"(clojure.test/deftest name-of-test
+  (clojure.test/is (= 4 (+ 2 2))))"
 
   (def src-with-comment-block-test
     (cs/join "\n"
@@ -152,75 +120,30 @@
               "  ;; => 2"
               ")"]))
 
-  (let [[actual expected]
-        (->> (ast/unwrap-comment-block
-              (ast/first-form src-with-comment-block-test))
-             (filter (fn [node]
-                       (not (ast/whitespace? node)))))]
-    (rewrite-as-test actual expected []))
-  #_ '[:list
-       [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-2"]
-       [:list
-        [:symbol "clojure.test/is"] [:whitespace " "]
-        [:list
-         [:symbol "="] [:whitespace " "]
-         (:number "2") [:whitespace " "]
-         (:list
-          (:symbol "+") (:whitespace " ")
-          (:number "1") (:whitespace " ")
-          (:number "1"))]]]
+  (ast/to-str
+   [(let [[actual expected]
+          (->> (ast/unwrap-comment-block
+                (ast/first-form src-with-comment-block-test))
+               (filter (fn [node]
+                         (not (ast/whitespace? node)))))]
+      (rewrite-as-test actual expected []))])
+  #_ "(clojure.test/deftest test-at-line-2(clojure.test/is (= 2 (+ 1 1))))"
 
-  (rewrite-as-test '^{:parcera.core/start {:row 1, :column 0},
-                      :parcera.core/end {:row 1, :column 12}}
-                   (:list
-                      (:symbol "+") (:whitespace " ")
-                      (:number "1") (:whitespace " ")
-                      (:number "1"))
-                    '(:comment ";; => 2")
-                    [])
-  #_ '[:list
-       [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-1"]
-       [:list
-        [:symbol "clojure.test/is"] [:whitespace " "]
-        [:list
-         [:symbol "="] [:whitespace " "]
-         (:number "2") [:whitespace " "]
-         (:list
-          (:symbol "+") (:whitespace " ")
-          (:number "1") (:whitespace " ")
-          (:number "1"))]]]
+  (ast/to-str
+   [(rewrite-as-test (ast/first-form "(+ 1 1)")
+                     (ast/first-form ";; => 2")
+                     [])])
+  ;; => "(clojure.test/deftest test-at-line-1(clojure.test/is (= 2 (+ 1 1))))"
 
-  (rewrite-as-test '^{:parcera.core/start {:row 1, :column 0},
-                      :parcera.core/end {:row 1, :column 12}}
-                     (:list
-                      (:symbol "+") (:whitespace " ")
-                      (:number "1") (:whitespace " ")
-                      (:number "1"))
-                    '(:comment ";; => 2")
-                    ['(:list
-                       (:symbol "def") (:whitespace " ")
-                       (:symbol "b") (:whitespace " ")
-                       (:number "1"))
-                     '(:whitespace "\n\n  ")])
-  #_ '[:list
-       [:symbol "clojure.test/deftest"] [:whitespace " "]
-       [:symbol "test-at-line-1"]
-       (:list
-        (:symbol "def") (:whitespace " ")
-        (:symbol "b") (:whitespace " ")
-        (:number "1"))
-       (:whitespace "\n\n  ")
-       [:list
-        [:symbol "clojure.test/is"] [:whitespace " "]
-        [:list
-         [:symbol "="] [:whitespace " "]
-         (:number "2") [:whitespace " "]
-         (:list
-          (:symbol "+") (:whitespace " ")
-          (:number "1") (:whitespace " ")
-          (:number "1"))]]]
+  (ast/to-str
+   [(rewrite-as-test (ast/first-form "(+ 1 1)")
+                     (ast/first-form ";; => 2")
+                     [(ast/first-form "(def b 1)")
+                      (ast/first-form "\n\n  ")])])
+  #_
+"(clojure.test/deftest test-at-line-1(def b 1)
+
+  (clojure.test/is (= 2 (+ 1 1))))"
 
   )
 
@@ -233,12 +156,13 @@
 
 (comment
 
-  (prune-stack [[:whitespace " "]
-                [:number "1"]
-                [:keyword "a"]
-                [:whitespace " "]
-                [:whitespace " "]])
-  ;; => [[:whitespace " "] [:number "1"]]
+  (prune-stack [(ast/first-form " ")
+                (ast/first-form "1")
+                (ast/first-form "a")
+                (ast/first-form " ")
+                (ast/first-form " ")])
+  #_ [(ast/first-form " ")
+      (ast/first-form "1")]
 
   )
 
@@ -268,78 +192,44 @@
 
 (comment
 
-  (rewrite-comment-block
-   (ast/first-form (str "(comment\n"
-                        "  (+ 1 1)\n"
-                        "  ;; => 2\n"
-                        ")")))
-  #_ '[[:whitespace "\n\n"]
-       [:list
-        [:symbol "clojure.test/deftest"] [:whitespace " "]
-        [:symbol "test-at-line-2"]
-        (:whitespace "\n  ")
-        [:list
-         [:symbol "clojure.test/is"] [:whitespace " "]
-         [:list
-          [:symbol "="] [:whitespace " "]
-          (:number "2") [:whitespace " "]
-          (:list
-           (:symbol "+") (:whitespace " ")
-           (:number "1") (:whitespace " ")
-           (:number "1"))]]]]
+  (ast/to-str
+   (rewrite-comment-block
+    (ast/first-form (str "(comment\n"
+                         "  (+ 1 1)\n"
+                         "  ;; => 2\n"
+                         ")"))))
+  #_ "
 
-  (rewrite-comment-block
-   (ast/first-form
-    (cs/join "\n"
-             ["(comment"
-              "  (def a 1)"
-              ""
-              "  (+ a 1)"
-              "  ;; => 2"
-              ""
-              "  (def b 1)"
-              ""
-              "  (+ a b)"
-              "  ;; => 3"
-              ")"])))
-  #_ '[(:whitespace "\n\n")
-       [:list
-        (:symbol "clojure.test/deftest") (:whitespace " ")
-        (:symbol "test-at-line-4")
-        (:whitespace "\n  ")
-        (:list
-         (:symbol "def") (:whitespace " ")
-         (:symbol "a") (:whitespace " ")
-         (:number "1"))
-        (:whitespace "\n\n  ")
-        [:list
-         (:symbol "clojure.test/is") (:whitespace " ")
-         [:list
-          (:symbol "=") (:whitespace " ")
-          (:number "2") (:whitespace " ")
-          (:list
-           (:symbol "+") (:whitespace " ")
-           (:symbol "a") (:whitespace " ")
-           (:number "1"))]]]
-       (:whitespace "\n\n")
-       [:list
-        (:symbol "clojure.test/deftest") (:whitespace " ")
-        (:symbol "test-at-line-9")
-        (:whitespace "\n\n  ")
-        (:list
-         (:symbol "def") (:whitespace " ")
-         (:symbol "b") (:whitespace " ")
-         (:number "1"))
-        (:whitespace "\n\n  ")
-        [:list
-         (:symbol "clojure.test/is") (:whitespace " ")
-         [:list
-          (:symbol "=") (:whitespace " ")
-          (:number "3") (:whitespace " ")
-          (:list
-           (:symbol "+") (:whitespace " ")
-           (:symbol "a") (:whitespace " ")
-           (:symbol "b"))]]]]
+(clojure.test/deftest test-at-line-2
+  (clojure.test/is (= 2 (+ 1 1))))"
+
+  (ast/to-str
+   (rewrite-comment-block
+    (ast/first-form
+     (cs/join "\n"
+              ["(comment"
+               "  (def a 1)"
+               ""
+               "  (+ a 1)"
+               "  ;; => 2"
+               ""
+               "  (def b 1)"
+               ""
+               "  (+ a b)"
+               "  ;; => 3"
+               ")"]))))
+  #_ "
+
+(clojure.test/deftest test-at-line-4
+  (def a 1)
+
+  (clojure.test/is (= 2 (+ a 1))))
+
+(clojure.test/deftest test-at-line-9
+
+  (def b 1)
+
+  (clojure.test/is (= 3 (+ a b))))"
 
   )
 
@@ -360,18 +250,6 @@
               "  (+ 1 1)"
               "  ;; => 2"
               ")"]))
-
-  (ast/forms src-with-one-comment-block-with-one-test)
-  #_ '((:list
-        (:symbol "comment")
-        (:whitespace "\n  ")
-        (:list
-         (:symbol "+") (:whitespace " ")
-         (:number "1") (:whitespace " ")
-         (:number "1"))
-        (:whitespace "\n  ")
-        (:comment ";; => 2")
-        (:whitespace "\n")))
 
   (ast/update-forms-and-format src-with-one-comment-block-with-one-test
                                rewrite-comment-blocks-with-tests)
@@ -511,7 +389,7 @@
 
   (ast/to-str [(remove-existing-tests-form)])
   #_
-  "(->> (keys (ns-interns *ns*))
+"(->> (keys (ns-interns *ns*))
      (filter (fn [test-sym]
        (re-matches #\"^test-at-line-.*\"
          (name test-sym))))
@@ -555,80 +433,27 @@
 
 (comment
 
-  (run-tests-with-summary-form)
-  #_ '(:list
-       (:symbol "binding") (:whitespace " ")
-       (:vector
-        (:symbol "clojure.test/*report-counters*")
-        (:whitespace "\n          ")
-        (:list
-         (:symbol "ref") (:whitespace " ")
-         (:symbol "clojure.test/*initial-report-counters*")))
-       (:whitespace "\n  ")
-       (:list
-        (:symbol "clojure.test/do-report") (:whitespace "\n    ")
-        (:list
-         (:symbol "clojure.test/test-vars") (:whitespace "\n      ")
-         (:list
-          (:symbol "->>") (:whitespace " ")
-          (:list
-           (:symbol "keys") (:whitespace " ")
-           (:list
-            (:symbol "ns-interns") (:whitespace " ")
-            (:symbol "*ns*")))
-          (:whitespace "\n           ")
-          (:list
-           (:symbol "keep") (:whitespace "\n             ")
-           (:list
-            (:symbol "fn") (:whitespace " ")
-            (:vector
-             (:symbol "test-sym"))
-            (:whitespace "\n               ")
-            (:list
-             (:symbol "let") (:whitespace " ")
-             (:vector
-              (:vector
-               (:symbol "_") (:whitespace " ")
-               (:symbol "test-num"))
-              (:whitespace "\n                     ")
-              (:list
-               (:symbol "re-matches") (:whitespace " ")
-               (:regex "\"^test-at-line-(.*)\"")
-               (:whitespace "\n                                 ")
-               (:list
-                (:symbol "name") (:whitespace " ")
-                (:symbol "test-sym"))))
-             (:whitespace "\n                 ")
-             (:list
-              (:symbol "when") (:whitespace " ")
-              (:symbol "test-num") (:whitespace "\n                   ")
-              (:vector
-               (:list
-                (:symbol "Integer.") (:whitespace " ")
-                (:symbol "test-num"))
-               (:whitespace "\n                    ")
-               (:list
-                (:symbol "intern") (:whitespace " ")
-                (:symbol "*ns*") (:whitespace " ")
-                (:symbol "test-sym")))))))
-          (:whitespace "\n           ")
-          (:list
-           (:symbol "sort-by") (:whitespace "\n             ")
-           (:list
-            (:symbol "fn") (:whitespace " ")
-            (:vector
-             (:vector
-              (:symbol "num") (:whitespace " ")
-              (:symbol "test-var")))
-            (:whitespace "\n               ")
-            (:symbol "num")))
-          (:whitespace "\n           ")
-          (:list
-           (:symbol "map") (:whitespace " ")
-           (:symbol "second")))))
-       (:whitespace "\n  ")
-       (:deref
-        (:symbol "clojure.test/*report-counters*")))
+  (ast/to-str
+   [(run-tests-with-summary-form)])
+  #_
+"(binding [clojure.test/*report-counters*
+          (ref clojure.test/*initial-report-counters*)]
+  (clojure.test/do-report
+    (clojure.test/test-vars
+      (->> (keys (ns-interns *ns*))
+           (keep
+             (fn [test-sym]
+               (let [[_ test-num]
+                     (re-matches #\"^test-at-line-(.*)\"
+                                 (name test-sym))]
+                 (when test-num
+                   [(Integer. test-num)
+                    (intern *ns* test-sym)]))))
+           (sort-by
+             (fn [[num test-var]]
+               num))
+           (map second))))
+  @clojure.test/*report-counters*)"
 
   )
 
@@ -646,48 +471,36 @@
               "(ns fun-namespace.main)"
               "(def a 1)"]))
 
-  (filter (fn [node]
-            (ast/ns-form? node))
-          (ast/forms src-with-ns))
-  #_ '((:list
-        (:symbol "ns") (:whitespace " ")
-        (:symbol "fun-namespace.main")))
+  (ast/to-str
+   (filter (fn [node]
+             (ast/ns-form? node))
+           (ast/forms src-with-ns)))
+  ;; => "(ns fun-namespace.main)"
 
-  (utils/splice-after-vec (ast/forms src-with-ns)
-                          ast/ns-form?
-                          [(ast/first-form "\n\n")
-                           (ast/first-form ";; i am a comment")])
-  #_ '[(:comment ";; fun comment")
-       (:whitespace "\n")
-       (:list
-        (:symbol "ns") (:whitespace " ")
-        (:symbol "fun-namespace.main"))
-       (:whitespace "\n\n")
-       (:comment ";; i am a comment")
-       (:whitespace "\n")
-       (:list
-        (:symbol "def") (:whitespace " ")
-        (:symbol "a") (:whitespace " ")
-        (:number "1"))]
+  (ast/to-str
+   (utils/splice-after-vec (ast/forms src-with-ns)
+                           ast/ns-form?
+                           [(ast/first-form "\n\n")
+                            (ast/first-form ";; i am a comment")]))
+  #_
+";; fun comment
+(ns fun-namespace.main)
 
-  (splice-after-ns-form (ast/forms src-with-ns)
-                        [(ast/first-form "\n\n")
-                         (require-form)
-                         (ast/first-form "\n")])
-  #_ '[(:comment ";; fun comment") (:whitespace "\n")
-       (:list
-        (:symbol "ns") (:whitespace " ")
-        (:symbol "fun-namespace.main"))
-       (:whitespace "\n\n")
-       (:list
-        (:symbol "require") (:whitespace " ")
-        (:quote
-         (:symbol "clojure.test")))
-       (:whitespace "\n") (:whitespace "\n")
-       (:list
-        (:symbol "def") (:whitespace " ")
-        (:symbol "a") (:whitespace " ")
-        (:number "1"))]
+;; i am a comment
+(def a 1)"
+
+  (ast/to-str
+   (splice-after-ns-form (ast/forms src-with-ns)
+                         [(ast/first-form "\n\n")
+                          (require-form)
+                          (ast/first-form "\n")]))
+  #_
+";; fun comment
+(ns fun-namespace.main)
+
+(require 'clojure.test)
+
+(def a 1)"
 
   )
 
@@ -707,52 +520,38 @@
               "(in-ns 'fun-namespace.main)"
               "(def a 1)"]))
 
-  (filter (fn [node]
-            (or (ast/ns-form? node)
-                (ast/in-ns-form? node)))
-          (ast/forms src-with-in-ns))
-  #_ '((:list
-        (:symbol "in-ns") (:whitespace " ")
-        (:quote
-         (:symbol "fun-namespace.main"))))
+  (ast/to-str
+   (filter (fn [node]
+             (or (ast/ns-form? node)
+                 (ast/in-ns-form? node)))
+           (ast/forms src-with-in-ns)))
+  ;; => "(in-ns 'fun-namespace.main)"
 
-  (utils/splice-after-vec (ast/forms src-with-ns)
-                          #(or (ast/ns-form? %)
-                               (ast/in-ns-form? %))
-                          [(ast/first-form "\n\n")
-                           (ast/first-form ";; i am a comment")])
-  #_ '[(:comment ";; fun comment")
-       (:whitespace "\n")
-       (:list
-        (:symbol "ns") (:whitespace " ")
-        (:symbol "fun-namespace.main"))
-       (:whitespace "\n\n")
-       (:comment ";; i am a comment")
-       (:whitespace "\n")
-       (:list
-        (:symbol "def") (:whitespace " ")
-        (:symbol "a") (:whitespace " ")
-        (:number "1"))]
+  (ast/to-str
+   (utils/splice-after-vec (ast/forms src-with-ns)
+                           #(or (ast/ns-form? %)
+                                (ast/in-ns-form? %))
+                           [(ast/first-form "\n\n")
+                            (ast/first-form ";; i am a comment")]))
+  #_
+";; fun comment
+(ns fun-namespace.main)
 
-  (splice-after-ns-ish-form (ast/forms src-with-in-ns)
-                            [(ast/first-form "\n\n")
-                             (require-form)
-                             (ast/first-form "\n")])
-  #_ '[(:comment ";; fun comment") (:whitespace "\n")
-       (:list
-        (:symbol "in-ns") (:whitespace " ")
-        (:quote
-         (:symbol "fun-namespace.main")))
-       (:whitespace "\n\n")
-       (:list
-        (:symbol "require") (:whitespace " ")
-        (:quote
-         (:symbol "clojure.test")))
-       (:whitespace "\n") (:whitespace "\n")
-       (:list
-        (:symbol "def") (:whitespace " ")
-        (:symbol "a") (:whitespace " ")
-        (:number "1"))]
+;; i am a comment
+(def a 1)"
+
+  (ast/to-str
+   (splice-after-ns-ish-form (ast/forms src-with-in-ns)
+                             [(ast/first-form "\n\n")
+                              (require-form)
+                              (ast/first-form "\n")]))
+  #_
+";; fun comment
+(in-ns 'fun-namespace.main)
+
+(require 'clojure.test)
+
+(def a 1)"
 
   )
 
