@@ -404,6 +404,27 @@
 
   )
 
+(defn has-newline?
+  [node]
+  (some-> (whitespace-str node)
+          (cs/index-of "\n")))
+
+(comment
+
+  (has-newline? '(:whitespace "\n  "))
+  ;; => 0
+
+  (has-newline? '(:whitespace " "))
+  ;; => nil
+
+  (has-newline? '(:whitespace " \n"))
+  ;; => 1
+
+  (has-newline? '(:number "1"))
+  ;; => nil
+
+)
+
 (defn discard-with-form?
   [ast]
   (some-> (first ast)
