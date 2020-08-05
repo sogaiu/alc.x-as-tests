@@ -1,5 +1,9 @@
 ;; TODO
 ;;
+;; XXX: think about current result of piping a test to "clj -" -- does it
+;;      make sense that one gets "nil" as output for the case of
+;;      all tests passing?
+;;
 ;; XXX: document runner in README
 ;;
 ;; XXX: whether and how to support cljs.  there are multiple cljs
@@ -18,9 +22,6 @@
 ;;      "XXX"
 
 ;; QUESTIONS:
-;;
-;; XXX: consider something like deep diff 2 for improving scannability
-;;      of test output?
 ;;
 ;; XXX: clean up test directory option?
 ;;
@@ -130,6 +131,13 @@
 ;;      verifying some kinds of results.  for automation, printed
 ;;      results aren't obviously available?  isn't there something
 ;;      like "print" that returns the value that it prints?
+;;
+;; XXX: consider something like deep diff 2 for improving scannability
+;;      of test output?  post-processing of test run info seems ok,
+;;      but may be not so good to require during a test run as that is
+;;      likely to impact the dependencies of the program being tested.
+;;      this is against the idea of not interfering with a program's
+;;      dependencies.
 
 ;; OBSERVATIONS
 ;;
