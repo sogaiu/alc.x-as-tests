@@ -264,7 +264,16 @@
                  (into acc (unwrap-comment-block elt))))
              []
              %))
-  ;; => "\n\n\n  (def y 2)\n\n\n\n(def x 1)\n"
+  #_
+"
+
+
+  (def y 2)
+
+
+
+(def x 1)
+"
 
   )
 
@@ -300,7 +309,17 @@
 
   (update-forms src-with-keyword-and-comment-block
                 unwrap-comment-blocks)
-  ;; => ":a\n\n\n\n  (def b 2)\n\n  (+ b 1)\n  ;; => 3\n\n"
+  #_
+":a
+
+
+
+  (def b 2)
+
+  (+ b 1)
+  ;; => 3
+
+"
 
   )
 
