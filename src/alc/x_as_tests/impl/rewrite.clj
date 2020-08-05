@@ -121,7 +121,7 @@
                        (ast/start-row actual-node))]
     ;; splicing seems cumbersome
     (into (create-deftest-opening test-name)
-          (conj (vec stack)
+          (conj (ensure-leading-newline stack)
                 (create-is-form actual-node expected-node)))))
 
 (comment
@@ -148,13 +148,17 @@
                (filter (fn [node]
                          (not (ast/whitespace? node)))))]
       (rewrite-as-test actual expected []))])
-  #_ "(clojure.test/deftest test-at-line-2(clojure.test/is (= 2 (+ 1 1))))"
+  #_
+"(clojure.test/deftest test-at-line-2
+(clojure.test/is (= 2 (+ 1 1))))"
 
   (ast/to-str
    [(rewrite-as-test (ast/first-form "(+ 1 1)")
                      (ast/first-form ";; => 2")
                      [])])
-  ;; => "(clojure.test/deftest test-at-line-1(clojure.test/is (= 2 (+ 1 1))))"
+  #_
+"(clojure.test/deftest test-at-line-1
+(clojure.test/is (= 2 (+ 1 1))))"
 
   (ast/to-str
    [(rewrite-as-test (ast/first-form "(+ 1 1)")
@@ -162,7 +166,8 @@
                      [(ast/first-form "(def b 1)")
                       (ast/first-form "\n\n  ")])])
   #_
-"(clojure.test/deftest test-at-line-1(def b 1)
+"(clojure.test/deftest test-at-line-1
+(def b 1)
 
   (clojure.test/is (= 2 (+ 1 1))))"
 
