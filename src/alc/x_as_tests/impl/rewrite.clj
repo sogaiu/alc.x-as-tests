@@ -91,6 +91,27 @@
 
  )
 
+(defn ensure-leading-newline
+  [stack]
+  (let [first-node (first stack)]
+    (if (ast/has-newline? first-node)
+      (vec stack)
+      (into [(ast/first-form "\n")] stack))))
+
+(comment
+
+  (ensure-leading-newline [(ast/first-form " ")
+                           (ast/first-form "1")])
+  #_ [(ast/first-form "\n")
+      (ast/first-form " ")
+      (ast/first-form "1")]
+
+  (ensure-leading-newline [(ast/first-form "1")])
+  #_ [(ast/first-form "\n")
+      (ast/first-form "1")]
+
+  )
+
 ;; XXX: deftest style for the moment
 (defn rewrite-as-test
   [actual-node expected-node stack]
