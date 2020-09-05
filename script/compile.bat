@@ -1,16 +1,18 @@
 @echo off
 
-Rem set GRAALVM_HOME=C:\Users\user\Desktop\graalvm-ce-java11-20.1.0
+Rem set GRAALVM_HOME=C:\Users\user\Desktop\graalvm-ce-java11-20.2.0
 
 if "%GRAALVM_HOME%"=="" (
     echo Please set GRAALVM_HOME
     exit /b
 )
-set JAVA_HOME=%GRAALVM_HOME%\bin
-set PATH=%PATH%;%GRAALVM_HOME%\bin
+set JAVA_HOME=%GRAALVM_HOME%
+set PATH=%GRAALVM_HOME%\bin;%PATH%
 
-call lein do clean, uberjar
+call lein with-profiles +clojure-1.10.2-alpha1,+native-image do clean, uberjar
 if %errorlevel% neq 0 exit /b %errorlevel%
+
+call %GRAALVM_HOME%\bin\gu.cmd install native-image
 
 Rem the --no-server option is not supported in GraalVM Windows.
 call %GRAALVM_HOME%\bin\native-image.cmd ^

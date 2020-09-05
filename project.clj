@@ -2,7 +2,7 @@
   :description "x as tests"
   :url "https://github.com/sogaiu/alc.x-as-tests"
   :source-paths ["src"]
-  :dependencies [[carocad/parcera "0.11.1"]
+  :dependencies [[carocad/parcera "0.11.3"]
                  [clj-kondo "2020.07.29"]
                  [org.antlr/antlr4-runtime "4.7.1"]
                  ;; parcera appears to need >= 1.10.x
@@ -17,7 +17,7 @@
              ;; see script/compile
              :native-image
              {:dependencies
-              [[borkdude/clj-reflector-graal-java11-fix "0.0.1-graalvm-20.1.0"]
+              [[borkdude/clj-reflector-graal-java11-fix "0.0.1-graalvm-20.2.0"]
                [borkdude/sci.impl.reflector "0.0.1-java11"]]}
              ;;
              :uberjar {:global-vars {*assert* false}

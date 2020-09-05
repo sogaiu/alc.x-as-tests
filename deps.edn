@@ -3,9 +3,9 @@
         ]
 
  :deps {
-        carocad/parcera {:mvn/version "0.11.1"}
+        carocad/parcera {:mvn/version "0.11.3"}
         clj-kondo {:mvn/version "2020.07.29"}
         org.antlr/antlr4-runtime {:mvn/version "4.7.1"}
-        org.clojure/clojure {:mvn/version "1.10.2-alpha1"}
+        org.clojure/clojure {:mvn/version "1.10.1"}
        }
 }
