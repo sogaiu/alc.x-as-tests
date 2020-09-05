@@ -1,5 +1,11 @@
 ;; TODO
 ;;
+;; XXX: alc.xat.exe may not work on windows because it assumes there
+;;      is something called "clojure" that can be executed.  this may
+;;      be a problem for two reasons: 1) lack of ".exe" file extension,
+;;      and 2) clojure on windows might be named something like
+;;      "cmd-clojure.exe" (a scoop shim)
+;;
 ;; XXX: think about current result of piping a test to "clj -" -- does it
 ;;      make sense that one gets "nil" as output for the case of
 ;;      all tests passing?
