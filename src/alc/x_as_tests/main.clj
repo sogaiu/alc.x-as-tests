@@ -16,7 +16,8 @@
 ;; XXX: some large values are more readable formatted.  unfortunately,
 ;;      this can be manual work.  it would be nice to have a more
 ;;      automated way to achieve formatting.  try to think of some
-;;      ways to achieve this.
+;;      ways to achieve this.  trying zprint-mode's zprint with some
+;;      success in emacs at least.
 ;;
 ;; XXX: there may be other issues noted as comments in the source.  look for
 ;;      "XXX"
