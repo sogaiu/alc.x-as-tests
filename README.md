@@ -148,7 +148,7 @@ This should produce a binary named `alc.xat.exe`.  Putting this on
 Note that on Windows, one of the usage invocations might be like:
 
 ```
-C:\Users\user\Desktop\alc.x-as-tests> type src\alc\x_as_tests\impl|ast.clj | .\alc.xat.exe > ast-with-test.clj
+C:\Users\user\Desktop\alc.x-as-tests> type src\alc\x_as_tests\impl\ast.clj | .\alc.xat.exe > ast-with-test.clj
 ```
 
 ## Technical Details
