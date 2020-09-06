@@ -1,18 +1,16 @@
 ;; TODO
 ;;
-;; XXX: alc.xat.exe may not work on windows because it assumes there
-;;      is something called "clojure" that can be executed.  this may
-;;      be a problem for two reasons: 1) lack of ".exe" file extension,
-;;      and 2) clojure on windows might be named something like
-;;      "cmd-clojure.exe" (a scoop shim)
+;; XXX: document runner in README along with the environment variable
+;;      ALC_XAT_CLJ_NAME for specifying the name (without file
+;;      extension) of the "clojure" binary.  the latter is a
+;;      work-around for being able to use scoop's "cmd-clojure.exe"
+;;      shim for "clojure"
 ;;
 ;; XXX: consider sending error output to stderr
 ;;
 ;; XXX: think about current result of piping a test to "clj -" -- does it
 ;;      make sense that one gets "nil" as output for the case of
 ;;      all tests passing?
-;;
-;; XXX: document runner in README
 ;;
 ;; XXX: whether and how to support cljs.  there are multiple cljs
 ;;      runtimes, so the idea of "supporting cljs" is not specific
