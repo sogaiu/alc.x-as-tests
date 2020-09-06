@@ -221,34 +221,41 @@
   )
 
 (defn do-tests!
-  [{:keys [:exts
+  [{:keys [:exe-name
+           :exts
            :paths
            :temp-root
            :verbose]
-    :or {exts #{".clj" ".cljc"}
+    :or {exe-name (or (System/getenv "ALC_XAT_CLJ_NAME")
+                      "clojure") ;; don't include file extension
+         exts #{".clj" ".cljc"}
          paths [(paths/as-abspath (System/getProperty "user.dir")
                                   "src")]
          temp-root (paths/as-abspath (System/getProperty "java.io.tmpdir")
                                      (str "alc.x-as-tests-"
                                           (System/currentTimeMillis)))}}]
-  (assert (paths/which "clojure") "Failed to locate clojure")
-  (let [paths (all-src-files paths exts)
-        proj-root (System/getProperty "user.dir")
-        test-paths (gen-tests! paths proj-root temp-root)
-        runner-path (paths/as-abspath temp-root
-                                      "alc.xat.run-tests.clj")
-        _ (spit runner-path (gen-run-schedule test-paths))
-        cmd ["clojure" "-i" runner-path]
-        {:keys [:err :exit :out]}
-        (cjs/with-sh-dir proj-root
-          (apply cjs/sh cmd))]
-    (when verbose
-      (println cmd))
-    (when (not= 0 exit)
-      (println cmd)
-      (println "  exit:" exit)
-      (println "  err:" err))
-    (println out)))
+  (if-let [clojure-bin (paths/which exe-name)]
+    (let [paths (all-src-files paths exts)
+          proj-root (System/getProperty "user.dir")
+          test-paths (gen-tests! paths proj-root temp-root)
+          runner-path (paths/as-abspath temp-root
+                                        "alc.xat.run-tests.clj")
+          _ (spit runner-path (gen-run-schedule test-paths))
+          cmd [clojure-bin "-i" runner-path]
+          {:keys [:err :exit :out]}
+          (cjs/with-sh-dir proj-root
+            (apply cjs/sh cmd))]
+      (when verbose
+        (println cmd))
+      (when (not= 0 exit)
+        (println cmd)
+        (println "  exit:" exit)
+        (println "  err:" err))
+      (println out))
+    (do
+      (println "Failed to find clojure executable:" exe-name)
+      (flush)
+      (System/exit 1))))
 
 (comment
 
