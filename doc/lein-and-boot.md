@@ -9,7 +9,7 @@ comparable quick trial invocation:
 
 ```
 $ cd ~/a-clj-proj-dir
-$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}}' -m alc.x-as-tests.main | lein repl
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "806f881c218988dcbfd77041f7f2b3e6c1fda3b3"}}}' -m alc.x-as-tests.main | lein repl
 ```
 
 Not as pretty perhaps (see note below about `lein exec`).
@@ -23,7 +23,7 @@ content with tests:
 
 ```
 $ cd ~/a-clj-proj-dir
-$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}}' -m alc.x-as-tests.main > fun-with-tests.clj
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "806f881c218988dcbfd77041f7f2b3e6c1fda3b3"}}}' -m alc.x-as-tests.main > fun-with-tests.clj
 ```
 
 Then:

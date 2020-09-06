@@ -31,6 +31,21 @@ Early stage.
 [When](doc/use-cases.md) this might be useful, and the [fine
 print](doc/limitations.md).
 
+## Sneak Preview
+
+There is a runner mode now that can be used to generate, run, and
+report on tests.  With the native-image version, one can use it from a
+project directory like:
+
+```
+alc.xat test
+```
+
+For the clj version, the invocation is:
+```
+clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "806f881c218988dcbfd77041f7f2b3e6c1fda3b3"}}}' -m alc.x-as-tests.main test
+```
+
 ## Quick Trial
 
 Suppose there is a Clojure project directory using `deps.edn`:
@@ -45,7 +60,7 @@ Generate a file with tests for `fun.clj` and execute them by:
 
 ```
 $ cd ~/a-clj-proj-dir
-$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}}' -m alc.x-as-tests.main | clj -
+$ cat src/fun.clj | clj -Sdeps '{:deps {alc.x-as-tests {:git/url "https://github.com/sogaiu/alc.x-as-tests" :sha "806f881c218988dcbfd77041f7f2b3e6c1fda3b3"}}}' -m alc.x-as-tests.main | clj -
 ```
 
 See [here](doc/lein-and-boot.md) for some more details including use
@@ -68,7 +83,7 @@ like:
  {
   :extra-deps {sogaiu/alc.x-as-tests
                 {:git/url "https://github.com/sogaiu/alc.x-as-tests"
-                 :sha "a38ab51270113e5ec4b904f97a8fd9d96f2fd3a5"}}
+                 :sha "806f881c218988dcbfd77041f7f2b3e6c1fda3b3"}}
   :main-opts ["-m" "alc.x-as-tests.main"]
  }
 ```
