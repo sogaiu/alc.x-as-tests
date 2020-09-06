@@ -6,6 +6,8 @@
 ;;      and 2) clojure on windows might be named something like
 ;;      "cmd-clojure.exe" (a scoop shim)
 ;;
+;; XXX: consider sending error output to stderr
+;;
 ;; XXX: think about current result of piping a test to "clj -" -- does it
 ;;      make sense that one gets "nil" as output for the case of
 ;;      all tests passing?
