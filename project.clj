@@ -20,7 +20,7 @@
               [[borkdude/clj-reflector-graal-java11-fix "0.0.1-graalvm-20.2.0"]
                [borkdude/sci.impl.reflector "0.0.1-java11"]]}
              ;;
-             :uberjar {:global-vars {*assert* false}
+             :uberjar {;;:global-vars {*assert* true}
                        :jvm-opts ["-Dclojure.compiler.direct-linking=true"
                                   "-Dclojure.spec.skip-macros=true"]
                        :aot :all
