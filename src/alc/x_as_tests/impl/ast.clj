@@ -606,9 +606,10 @@
 
 (defn ns-form?
   [ast]
-  (and (list-node? ast)
-       (symbol-node? (list-head ast))
-       (= "ns" (symbol-name (list-head ast)))))
+  (when (and (list-node? ast)
+             (symbol-node? (list-head ast))
+             (= "ns" (symbol-name (list-head ast))))
+    ast))
 
 (comment
 
@@ -621,15 +622,18 @@
         (:symbol "fun-namespace.main"))
 
   (ns-form? (first-form src-with-ns))
-  ;; => true
+  #_ '(:list
+        (:symbol "ns") (:whitespace " ")
+        (:symbol "fun-namespace.main"))
 
   )
 
 (defn in-ns-form?
   [ast]
-  (and (list-node? ast)
-       (symbol-node? (list-head ast))
-       (= "in-ns" (symbol-name (list-head ast)))))
+  (when (and (list-node? ast)
+             (symbol-node? (list-head ast))
+             (= "in-ns" (symbol-name (list-head ast))))
+    ast))
 
 (comment
 
@@ -643,6 +647,10 @@
         (:symbol "clojure.core")))
 
   (in-ns-form? (first-form src-with-in-ns))
+  #_ '(:list
+       (:symbol "in-ns") (:whitespace " ")
+       (:quote
+        (:symbol "clojure.core")))
 
   )
 
@@ -659,7 +667,9 @@
               "(def a 1)"]))
 
   (has-ns-form? (forms src-with-ns-and-other))
-  ;; => true
+  #_ '(:list
+       (:symbol "ns") (:whitespace " ")
+       (:symbol "fun-namespace.main"))
 
   (def src-without-ns-form
     (cs/join "\n"
@@ -687,7 +697,9 @@
               "(def a 1)"]))
 
   (has-ns-ish-form? (forms src-with-ns-and-other-again))
-  ;; => true
+  #_ '(:list
+       (:symbol "ns") (:whitespace " ")
+       (:symbol "fun-namespace.main"))
 
   (def src-without-ns-form-again
     (cs/join "\n"
@@ -696,7 +708,10 @@
               "(def a 1)"]))
 
   (has-ns-ish-form? (forms src-without-ns-form-again))
-  ;; => true
+  #_ '(:list
+       (:symbol "in-ns") (:whitespace " ")
+       (:quote
+        (:symbol "fun-namespace.main")))
 
   )
 
