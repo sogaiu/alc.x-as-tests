@@ -3,7 +3,7 @@
   :url "https://github.com/sogaiu/alc.x-as-tests"
   :source-paths ["src"]
   :dependencies [[carocad/parcera "0.11.3"]
-                 [clj-kondo "2020.07.29"]
+                 [clj-kondo/clj-kondo "2020.09.09"]
                  [org.antlr/antlr4-runtime "4.7.1"]
                  ;; parcera appears to need >= 1.10.x
                  [org.clojure/clojure "1.10.1"]]
