@@ -28,6 +28,7 @@
                                "src" "alc" "x_as_tests"
                                path))
            ["impl/ast.clj"
+            "impl/ex.clj"
             "impl/paths.clj"
             "impl/rewrite.clj"
             "impl/runner.clj"

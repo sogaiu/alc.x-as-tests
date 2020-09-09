@@ -1,6 +1,7 @@
 (ns alc.x-as-tests.impl.rewrite
   (:require
    [alc.x-as-tests.impl.ast :as ast]
+   [alc.x-as-tests.impl.ex :as ex]
    [alc.x-as-tests.impl.utils :as utils]
    [clojure.string :as cs]))
 
@@ -115,8 +116,9 @@
 ;; XXX: deftest style for the moment
 (defn rewrite-as-test
   [actual-node expected-node stack]
-  (assert (ast/has-start-meta? actual-node)
-          "actual node missing location info")
+  (when-not (ast/has-start-meta? actual-node)
+    (ex/throw-info {:err-msg (str "actual node missing location info: "
+                                  actual-node)}))
   (let [test-name (str "test-at-line-"
                        (ast/start-row actual-node))]
     ;; splicing seems cumbersome

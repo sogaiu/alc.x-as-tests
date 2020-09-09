@@ -1,5 +1,6 @@
 (ns alc.x-as-tests.impl.ast
   (:require
+   [alc.x-as-tests.impl.ex :as ex]
    [clojure.string :as cs]
    [parcera.core :as pc]))
 
@@ -535,7 +536,8 @@
 ;; XXX: determine what else needs to be ignored
 (defn list-head
   [ast]
-  (assert (list-node? ast) (str "not a list: " ast))
+  (when-not (list-node? ast)
+    (ex/throw-info {:err-msg (str "Not a list node: " ast)}))
   (->> (rest ast)
        (drop-while (fn [node]
                      ;; XXX: other things to filter out?
@@ -591,7 +593,8 @@
 
 (defn symbol-name
   [ast]
-  (assert (symbol-node? ast) (str "not symbol node: " ast))
+  (when-not (symbol-node? ast)
+    (ex/throw-info {:err-msg (str "not symbol node: " ast)}))
   (second ast))
 
 (comment

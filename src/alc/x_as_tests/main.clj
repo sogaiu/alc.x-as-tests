@@ -175,6 +175,7 @@
 
 (ns alc.x-as-tests.main
   (:require
+   [alc.x-as-tests.impl.ex :as ex]
    [alc.x-as-tests.impl.rewrite :as rewrite]
    [alc.x-as-tests.impl.runner :as runner]
    [alc.x-as-tests.impl.validate :as validate])
@@ -182,20 +183,31 @@
 
 (set! *warn-on-reflection* true)
 
-(defn -main
+(defn main
   [& args]
   (if (= (first args) "test")
     ;; XXX: draft -- allow specification of things from command line?
     (runner/do-tests! {})
     ;; generate test
-    (let [slurped (slurp *in*)]
-      (when-let [findings (validate/check-source slurped)]
-        (binding [*out* *err*]
-          (println "Errors detected in source")
-          (doseq [{:keys [message row]} findings]
-            (println "row:" row " - " message)))
-        (flush)
-        (System/exit 1))
-      (print (rewrite/rewrite-with-tests slurped))))
-  (flush)
-  (System/exit 0))
+    (let [source-str (slurp *in*)]
+      (when-not (System/getenv "ALC_XAT_SKIP_VALIDATION")
+        (validate/do-it source-str))
+      (print (rewrite/rewrite-with-tests source-str))))
+  0)
+
+(defn -main
+  [& args]
+  (let [status
+        (try (apply main args)
+             (catch Throwable t
+               (binding [*out* *err*]
+                 (if (= ex/msg-const (.getMessage t))
+                   (do
+                     (println (:err-msg (ex-data t)))
+                     1)
+                   (do
+                     (println "Unexpected Throwable")
+                     (.printStackTrace t)
+                     2)))))]
+    (flush)
+    (System/exit status)))
