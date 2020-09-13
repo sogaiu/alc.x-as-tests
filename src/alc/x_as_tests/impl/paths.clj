@@ -25,7 +25,7 @@
   (which "clojure")
   ;; => "/usr/bin/clojure"
 
-  )
+  ,)
 
 (defn as-abspath
   [& paths]
@@ -38,7 +38,7 @@
   #_ (str (System/getProperty "user.dir") "/"
           "src")
 
-  )
+  ,)
 
 (defn has-filext?
   [path exts]
@@ -59,4 +59,4 @@
                #{".clj"})
   ;; => nil
 
-  )
+  ,)

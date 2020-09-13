@@ -22,7 +22,7 @@
   (last-non-whitespace [])
   ;; => nil
 
-  )
+  ,)
 
 (defn create-deftest-opening
   [test-name]
@@ -35,7 +35,7 @@
    [(create-deftest-opening "test-at-line-7650")])
   ;; => "(clojure.test/deftest test-at-line-7650)"
 
-  )
+  ,)
 
 (defn rewrite-expected
   [node]
@@ -59,7 +59,7 @@
    [(rewrite-expected (ast/first-form "#_ {:a a}"))])
   ;; => "{:a a}"
 
-  )
+  ,)
 
 ;; the point of this is splicing
 (defn create-equals-form
@@ -76,7 +76,7 @@
                         (ast/first-form "(+ 1 1)"))])
   ;; => "(= 2 (+ 1 1))"
 
-  )
+  ,)
 
 (defn create-is-form
   [actual-node expected-node]
@@ -90,7 +90,7 @@
                     (ast/first-form ";; => 2"))])
   ;; => "(clojure.test/is (= 2 (+ 1 1)))"
 
- )
+ ,)
 
 (defn ensure-leading-newline
   [stack]
@@ -111,7 +111,7 @@
   #_ [(ast/first-form "\n")
       (ast/first-form "1")]
 
-  )
+  ,)
 
 ;; XXX: deftest style for the moment
 (defn rewrite-as-test
@@ -173,7 +173,7 @@
 
   (clojure.test/is (= 2 (+ 1 1))))"
 
-  )
+  ,)
 
 (defn prune-stack
   [stack]
@@ -192,7 +192,7 @@
   #_ [(ast/first-form " ")
       (ast/first-form "1")]
 
-  )
+  ,)
 
 (defn rewrite-comment-block
   [comment-block]
@@ -259,7 +259,7 @@
 
   (clojure.test/is (= 3 (+ a b))))"
 
-  )
+ ,)
 
 (defn rewrite-comment-blocks-with-tests
   [nodes]
@@ -390,7 +390,7 @@
   (clojure.test/is (= {:a a
       :b b} (conj {:a a} [:b b]))))"
 
-  )
+ ,)
 
 ;; XXX: this has "test-at-line-" baked in
 (defn remove-existing-tests-form
@@ -424,7 +424,7 @@
      (run! (fn [test-sym]
              (ns-unmap *ns* test-sym))))"
 
-  )
+ ,)
 
 (defn require-form
   []
@@ -435,7 +435,7 @@
   (ast/to-str [(require-form)])
   ;; => "(require 'clojure.test)"
 
-  )
+ ,)
 
 (defn run-tests-with-summary-form
   []
@@ -483,7 +483,7 @@
            (map second))))
   @clojure.test/*report-counters*)"
 
-  )
+ ,)
 
 (defn splice-after-ns-form
   [nodes more-nodes]
@@ -530,7 +530,7 @@
 
 (def a 1)"
 
-  )
+ ,)
 
 (defn splice-after-ns-ish-form
   [nodes more-nodes]
@@ -581,7 +581,7 @@
 
 (def a 1)"
 
-  )
+ ,)
 
 (defn rewrite-with-tests
   [src]
@@ -770,7 +770,7 @@
 
 "
 
-  )
+ ,)
 
 (defn rewrite-without-non-comment-blocks
   [src]
@@ -901,7 +901,7 @@
 
 "
 
-  )
+ ,)
 
 ;; XXX: this is experimental
 (defn run-test-via-path
@@ -929,6 +929,6 @@
         (run-test-via-path a-path)
         (in-ns original-ns)))
 
-    )
+   ,)
 
-  )
+ ,)

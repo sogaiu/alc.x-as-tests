@@ -22,7 +22,7 @@
   #_ {:parcera.core/start {:row 1, :column 0},
       :parcera.core/end {:row 1, :column 12}}
 
-  )
+  ,)
 
 (defn forms
   [src]
@@ -49,7 +49,7 @@
   (forms "")
   ;; => '()
 
-  )
+  ,)
 
 (defn to-str
   [nodes]
@@ -67,7 +67,7 @@
              [:number "2"]]])
   ;; => "(+ 1 2)"
 
-  )
+  ,)
 
 (defn first-form
   [src]
@@ -105,7 +105,7 @@
   (first-form src-with-line-comment)
   ;; => [:comment ";; hi there"]
 
-  )
+  ,)
 
 (defn first-form-vec
   [src]
@@ -125,7 +125,7 @@
        (:symbol "a") (:whitespace " ")
        (:number "1")]
 
-)
+  ,)
 
 (defn has-start-meta?
   [node]
@@ -140,7 +140,7 @@
                      (:symbol "comment")))
   ;; => nil
 
- )
+ ,)
 
 (defn start-row
   [node]
@@ -156,7 +156,7 @@
                (:symbol "comment")))
   ;; => nil
 
- )
+ ,)
 
 (defn comment-symbol?
   [ast]
@@ -170,7 +170,7 @@
   (comment-symbol? '(:symbol "comment"))
   ;; => true
 
-  )
+ ,)
 
 (defn comment-block?
   [ast]
@@ -206,7 +206,7 @@
        count)
   ;; => 1
 
-  )
+  ,)
 
 (defn unwrap-comment-block
   [ast]
@@ -232,7 +232,7 @@
   (unwrap-comment-block empty-comment-block-ast)
   ;; => '()
 
-  )
+  ,)
 
 (defn update-forms
   [src a-fn]
@@ -266,7 +266,7 @@
              []
              %))
   #_
-"
+ "
 
 
   (def y 2)
@@ -276,14 +276,14 @@
 (def x 1)
 "
 
-  )
+ ,)
 
 (defn unwrap-comment-blocks
   [nodes]
   (reduce (fn [acc elt]
-               (if (not (comment-block? elt))
-                 (conj acc elt)
-                 (into acc (unwrap-comment-block elt))))
+              (if (not (comment-block? elt))
+                (conj acc elt)
+                (into acc (unwrap-comment-block elt))))
           []
           nodes))
 
@@ -311,7 +311,7 @@
   (update-forms src-with-keyword-and-comment-block
                 unwrap-comment-blocks)
   #_
-":a
+ ":a
 
 
 
@@ -322,7 +322,7 @@
 
 "
 
-  )
+ ,)
 
 (defn line-comment?
   [ast]
@@ -334,7 +334,7 @@
   (line-comment? '(:comment ";; hi there"))
   ;; => true
 
-  )
+  ,)
 
 (defn comment-string
   [ast]
@@ -346,7 +346,7 @@
   (comment-string '(:comment ";; smile!"))
   ;; => ";; smile!"
 
-  )
+  ,)
 
 (defn line-comment-with-expected?
   [ast]
@@ -366,7 +366,7 @@
   (line-comment-with-expected? '(:comment ";; => :expected-value"))
   ;; => [";; => :expected-value" ":expected-value"]
 
-  )
+  ,)
 
 (defn expected-from-line-comment
   [expected-comment]
@@ -379,7 +379,7 @@
   (expected-from-line-comment '(:comment ";; => 2"))
   ;; => [:number "2"]
 
-  )
+  ,)
 
 (defn whitespace?
   [ast]
@@ -391,7 +391,7 @@
   (whitespace? '(:whitespace "\n  "))
   ;; => true
 
-)
+  ,)
 
 (defn whitespace-str
   [node]
@@ -403,7 +403,7 @@
   (whitespace-str '(:whitespace " \n "))
   ;; => " \n "
 
-  )
+  ,)
 
 (defn has-newline?
   [node]
@@ -424,7 +424,7 @@
   (has-newline? '(:number "1"))
   ;; => nil
 
-)
+  ,)
 
 (defn discard-with-form?
   [ast]
@@ -455,7 +455,7 @@
       (:number "1"))))
   ;; => true
 
-  )
+  ,)
 
 ;; from Clojure.g4 in parcera:
 ;;
@@ -501,7 +501,7 @@
   (undiscard (first-form "#_ #_ :a :b"))
   ;; => '(:keyword ":b")
 
-  )
+  ,)
 
 (defn expected-from-discard
   [discard-with-form]
@@ -519,7 +519,7 @@
        (:whitespace " ")
        (:symbol "a"))
 
-  )
+  ,)
 
 (defn list-node?
   [ast]
@@ -531,7 +531,7 @@
   (list-node? (first-form "(+ 1 1)"))
   ;; => true
 
-  )
+  ,)
 
 ;; XXX: determine what else needs to be ignored
 (defn list-head
@@ -574,7 +574,7 @@
   (list-head (first-form "(#_ - + 1 1)"))
   ;; => '(:symbol "+")
 
-  )
+  ,)
 
 (defn symbol-node?
   [ast]
@@ -589,7 +589,7 @@
   (symbol-node? (first-form ":hi"))
   ;; => false
 
-  )
+  ,)
 
 (defn symbol-name
   [ast]
@@ -602,7 +602,7 @@
   (symbol-name (first-form "hi"))
   ;; => "hi"
 
-  )
+  ,)
 
 (defn ns-form?
   [ast]
@@ -626,7 +626,7 @@
         (:symbol "ns") (:whitespace " ")
         (:symbol "fun-namespace.main"))
 
-  )
+  ,)
 
 (defn in-ns-form?
   [ast]
@@ -652,7 +652,7 @@
        (:quote
         (:symbol "clojure.core")))
 
-  )
+  ,)
 
 (defn has-ns-form?
   [nodes]
@@ -680,7 +680,7 @@
   (has-ns-form? (forms src-without-ns-form))
   ;; => nil
 
-  )
+  ,)
 
 (defn has-ns-ish-form?
   [nodes]
@@ -713,7 +713,7 @@
        (:quote
         (:symbol "fun-namespace.main")))
 
-  )
+  ,)
 
 (defn collapse-whitespace
   [ws-str]
@@ -741,7 +741,7 @@
   (collapse-whitespace " \n")
   ;; => "\n"
 
-  )
+  ,)
 
 (defn merge-whitespace
   [nodes]
@@ -800,7 +800,7 @@
        [:whitespace "\n\n"]
        (:keyword ":b")]
 
-  )
+  ,)
 
 (defn update-forms-and-format
   [src a-fn]
@@ -846,5 +846,4 @@
       :b b}
 
 "
-
-  )
+  ,)

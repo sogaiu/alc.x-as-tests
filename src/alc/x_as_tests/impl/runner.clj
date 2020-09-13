@@ -36,7 +36,7 @@
             "impl/validate.clj"
             "main.clj"]))
 
-  )
+ ,)
 
 (defn all-src-files
   [paths exts]
@@ -70,7 +70,7 @@
           (map #(.getAbsolutePath %))
           set)
 
-  )
+ ,)
 
 (defn gen-test-path
   [full-path root-path test-root]
@@ -98,7 +98,7 @@
                        "alc" "x_as_tests"
                        "main.clj")
 
-  )
+ ,)
 
 ;; XXX: generates test file paths and populates the corr files
 (defn gen-tests!
@@ -130,7 +130,7 @@
                         "src" "alc" "x_as_tests"
                         "main.clj")]
 
-  )
+ ,)
 
 (comment
 
@@ -150,7 +150,7 @@
            (vector (str s#)
                    v#)))))
 
-  )
+ ,)
 
 ;; XXX: break this up?
 (defn gen-run-schedule
@@ -217,9 +217,9 @@
                                         "fin.clj")
                       (paths/as-abspath (System/getProperty "user.dir")
                                         "fun.clj")])
-   )
+  ,)
 
-  )
+ ,)
 
 (defn do-tests!
   [{:keys [:exe-name
@@ -268,4 +268,4 @@
                 :paths [(paths/as-abspath impl-dir "ast.clj")
                         (paths/as-abspath impl-dir "rewrite.clj")]}))
 
-  )
+ ,)
