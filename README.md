@@ -14,7 +14,7 @@ blocks as tests, e.g.:
   (- 1 1)
   ;; => 0
 
-)
+ ,)       <-- comma is for parinfer users
 ```
 
 ## Status
@@ -29,7 +29,7 @@ Early stage.
 ## Use Cases and Limitations
 
 [When](doc/use-cases.md) this might be useful, and the [fine
-print](doc/limitations.md).
+print](doc/limitations.md), especially parinfer users.
 
 ## Sneak Preview
 
