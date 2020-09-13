@@ -55,12 +55,12 @@
     (+ 1 1))
     ;; => 2
   ```
-  Note that the closing parenthesis has been moved passed the comment
-  which was expressing an expected value.
+  Note that the comment block's closing parenthesis has been moved so
+  that it is now before the line comment `;; => 2` which was expressing
+  an expected value.
 
-  To work-around this, one can apply the "door stop" technique
-  (mentiond on #parinfer in slack).  Actually, this is an adaptation
-  of it:
+  To work around this, one can apply a "door stop" technique
+  (mentioned on #parinfer in slack).
   ```
   (comment
 
@@ -70,11 +70,11 @@
    ,)      <-- the comma seems to help
   ```
   The gist is to use something to "pin" the closing paren to remain
-  after any comments (which might be expressing expected values).
+  after any line comments (which might be expressing expected values).
 
-  The original suggestions encountered were: `[]` and `#__`.  The
-  former may work fine, but the latter may be problematic as it might
-  get interpreted itself as expressing the idea that `_` is an
+  The original suggestions encountered were to use: `[]` or `#__`.
+  The former may work fine, but the latter may be problematic as it
+  might get interpreted itself as expressing the idea that `_` is an
   expected value, thus it is not recommended.
 
   It appears that among some comment-block using folks, the use of a
