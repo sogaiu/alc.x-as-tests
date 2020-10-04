@@ -23,7 +23,7 @@
 (comment
 
   (which "clojure")
-  ;; => "/usr/bin/clojure"
+  ;; => "/usr/local/bin/clojure"
 
   ,)
 
